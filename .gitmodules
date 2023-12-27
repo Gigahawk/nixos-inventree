@@ -1,0 +1,3 @@
+[submodule "InvenTree"]
+	path = InvenTree
+	url = https://github.com/inventree/InvenTree.git
