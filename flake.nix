@@ -61,7 +61,7 @@
           text = ''
             INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
             pushd $INVENTREE_SRC/InvenTree
-            gunicorn -c gunicorn.conf.py InvenTree.wsgi -b 127.0.0.1:8000
+            gunicorn -c gunicorn.conf.py InvenTree.wsgi
             popd
           '';
         };
