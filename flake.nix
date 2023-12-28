@@ -16,6 +16,11 @@
     let
       pkgs = nixpkgs.legacyPackages.${system};
       version = "0.13.0";
+
+      packageOverrides = pkgs.callPackage ./python-overrides.nix { };
+      python = pkgs.python3.override { inherit packageOverrides; };
+      pythonPackages = import ./python-requirements.nix;
+      pythonWithPackages = python.withPackages pythonPackages;
     in {
       packages = {
         inventree-src = with import nixpkgs { inherit system; };
@@ -45,24 +50,10 @@
             platforms = platforms.all;
           };
         };
-        inventree = with import nixpkgs { inherit system; };
-        let
-          #generatedOverrides = pkgs.callPackage ./python-packages.nix { };
-          #manualOverrides = self: super: {
-          #  pillow = pythonPackages.pillow.overrideDerivation(old:
-          #    with super.pillow; { inherit name src; }
-          #);};
-          #packageOverrides = lib.mkMerge [ generatedOverrides manualOverrides ];
-          packageOverrides = pkgs.callPackage ./python-overrides.nix { };
-          python = pkgs.python3.override { inherit packageOverrides; };
-
-          pythonPackages = import ./python-requirements.nix;
-          pythonWithPackages = python.withPackages pythonPackages;
-        in
+        inventree-server = with import nixpkgs { inherit system; };
         pkgs.writeShellApplication rec {
-          name = "inventree";
+          name = "inventree-server";
           runtimeInputs = [
-            #python311Packages.gunicorn
             pythonWithPackages
             self.packages.${system}.inventree-src
           ];
@@ -70,16 +61,32 @@
           text = ''
             INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
             pushd $INVENTREE_SRC/InvenTree
-            ls
-            type gunicorn
             gunicorn -c gunicorn.conf.py InvenTree.wsgi -b 127.0.0.1:8000
             popd
           '';
         };
-        default = self.packages.${system}.inventree;
+        inventree-cluster = with import nixpkgs { inherit system; };
+        pkgs.writeShellApplication rec {
+          name = "inventree-cluster";
+          runtimeInputs = [
+            pythonWithPackages
+            self.packages.${system}.inventree-src
+          ];
+
+          text = ''
+            INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
+            pushd $INVENTREE_SRC/InvenTree
+            python manage.py qcluster
+            popd
+          '';
+        };
+
       };
       devShell = pkgs.mkShell {
-        inputsFrom = [ self.packages.${system}.inventree ];
+        inputsFrom = [
+          self.packages.${system}.inventree-server
+          self.packages.${system}.inventree-cluster
+        ];
         nativeBuildInputs = [
           pip2nix.packages.${system}.pip2nix.python39
         ];
