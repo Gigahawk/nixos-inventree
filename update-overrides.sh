@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 
-pip2nix generate -r InvenTree/requirements.txt
+set -Eeuo pipefail
 
-# Keep original copy just in case
-cp python-packages.nix python-packages.nix.orig
+OVERRIDES=python-overrides.nix
 
-# Remove existing packages from overrides
+./generate_package_list.py
+
+echo "Generating initial override list as $OVERRIDES"
+pip2nix generate -r InvenTree/requirements.txt --output "$OVERRIDES"
+
+echo "Initial generation complete, saving copy as ${OVERRIDES}.orig"
+cp "$OVERRIDES" "${OVERRIDES}.orig"
+
+echo "Removing overrides with matching names on nixpkgs"
 ./clean_generated_nix.py

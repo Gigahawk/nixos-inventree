@@ -2,6 +2,7 @@
 from pathlib import Path
 
 BASE_REQUIREMENTS = Path("InvenTree/requirements.txt")
+OUTPUT = Path("python-requirements.nix")
 
 def get_requirements_list():
     with open(BASE_REQUIREMENTS, "r") as f:
@@ -18,6 +19,18 @@ def get_requirements_list():
         cleaned_lines.append(line[:idx])
     return cleaned_lines
 
+def main():
+    print("Generating environment requirements list")
+    requirements = get_requirements_list()
+    lines = [
+        "ps: with ps; ["
+    ]
+    for r in requirements:
+        print(r)
+        lines.append(f"  {r}")
+    lines.append("]")
+    with open(OUTPUT, "w") as f:
+        f.write("\n".join(lines))
+
 if __name__ == "__main__":
-    for l in get_requirements_list():
-        print(l)
+    main()

@@ -4,7 +4,7 @@ from pprint import pprint
 from pathlib import Path
 import re
 import subprocess
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool
 
 from generate_package_list import get_requirements_list, BASE_REQUIREMENTS
 
@@ -23,18 +23,20 @@ def only_existing_pkgs(package):
         capture_output=True,
         text=True,
         )
-    out = ansi_escape.sub('', proc.stdout)
-    if f"{search_str} (" in out:
-        return package
+    stdout = ansi_escape.sub('', proc.stdout)
+    out_lines = stdout.splitlines()
+    for line in out_lines:
+        if f"{search_str} (" in line:
+            print(f"Package '{package}' is already on nixpkgs:\n{line.strip()}")
+            return package
     return ""
 
 
 def get_existing_requirements():
-    pool = Pool(len(base_list))
+    print("Searching for overrides already present on nixpkgs")
+    pool = ThreadPool(len(base_list))
     existing_packages = sorted(
         [p for p in pool.map(only_existing_pkgs, base_list) if p])
-    print("Packages found in nixpkgs:")
-    pprint(existing_packages)
     return existing_packages
 
 def get_cleaned_requirements():
@@ -61,9 +63,3 @@ def write_cleaned_requirements_file():
 
 if __name__ == "__main__":
     write_cleaned_requirements_file()
-
-
-
-
-
-

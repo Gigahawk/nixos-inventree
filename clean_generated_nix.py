@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-from pprint import pprint
+import os
 from pathlib import Path
 
 from generate_missing_requirements import get_existing_requirements
 
-GENERATED = Path("python-packages.nix")
+GENERATED = Path(os.environ.get("OVERRIDES", "python-overrides.nix"))
 
 existing_requirements = get_existing_requirements()
 
+print(f"Opening overrides file {GENERATED}")
 with open(GENERATED, "r") as f:
     lines = f.readlines()
 
@@ -49,6 +50,7 @@ for p in needed_package_lines:
         output_lines.append(l)
 output_lines.append(last_line)
 
+print(f"Saving stripped overrides to {GENERATED}")
 with open(GENERATED, "w") as f:
     f.write("".join(output_lines))
 
