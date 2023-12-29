@@ -19,7 +19,7 @@
 
       packageOverrides = pkgs.callPackage ./python-overrides.nix { };
       python = pkgs.python3.override { inherit packageOverrides; };
-      pythonPackages = import ./python-requirements.nix;
+      pythonPackages = import ./python-all-requirements.nix;
       pythonWithPackages = python.withPackages pythonPackages;
     in {
       packages = {

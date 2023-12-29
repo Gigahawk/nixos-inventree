@@ -23,7 +23,8 @@ def main():
     print("Generating environment requirements list")
     requirements = get_requirements_list()
     lines = [
-        "ps: with ps; ["
+        "{ ps }:",
+        "with ps; ["
     ]
     for r in requirements:
         print(r)
