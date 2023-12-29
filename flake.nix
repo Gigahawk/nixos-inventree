@@ -95,6 +95,21 @@
             popd > /dev/null 2>&1
           '';
         };
+        inventree-python = with import nixpkgs { inherit system; };
+        pkgs.writeShellApplication rec {
+          name = "inventree-python";
+          runtimeInputs = [
+            pythonWithPackages
+            self.packages.${system}.inventree-src
+          ];
+
+          text = ''
+            INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
+            pushd $INVENTREE_SRC > /dev/null 2>&1
+            python
+            popd > /dev/null 2>&1
+          '';
+        };
         inventree-gen-secret = with import nixpkgs { inherit system; };
         let
           genScript = pkgs.writeScript "gen_secret_key.py" ''
