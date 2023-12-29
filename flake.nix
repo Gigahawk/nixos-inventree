@@ -81,6 +81,22 @@
           '';
         };
         inventree-invoke = with import nixpkgs { inherit system; };
+        let
+          # invoke command from nixpkgs is a prebuilt binary that appears to
+          # ignore the environment, create our own script to run invoke with
+          # our environment
+          invokeMain = pkgs.writeScript "invokeMain" ''
+            from invoke import Program, __version__
+
+            program = Program(
+                name="Invoke",
+                binary="inv[oke]",
+                binary_names=["invoke", "inv"],
+                version=__version__,
+            )
+            program.run()
+          '';
+        in
         pkgs.writeShellApplication rec {
           name = "inventree-invoke";
           runtimeInputs = [
@@ -91,7 +107,7 @@
           text = ''
             INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
             pushd $INVENTREE_SRC > /dev/null 2>&1
-            invoke "$@"
+            python ${invokeMain} "$@"
             popd > /dev/null 2>&1
           '';
         };
