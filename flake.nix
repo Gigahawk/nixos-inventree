@@ -80,6 +80,21 @@
             popd
           '';
         };
+        inventree-invoke = with import nixpkgs { inherit system; };
+        pkgs.writeShellApplication rec {
+          name = "inventree-invoke";
+          runtimeInputs = [
+            pythonWithPackages
+            self.packages.${system}.inventree-src
+          ];
+
+          text = ''
+            INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
+            pushd $INVENTREE_SRC > /dev/null 2>&1
+            invoke "$@"
+            popd > /dev/null 2>&1
+          '';
+        };
         inventree-gen-secret = with import nixpkgs { inherit system; };
         let
           genScript = pkgs.writeScript "gen_secret_key.py" ''
