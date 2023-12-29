@@ -141,6 +141,7 @@
         ];
         nativeBuildInputs = [
           pip2nix.packages.${system}.pip2nix.python39
+          pythonWithPackages
         ];
       };
     });
