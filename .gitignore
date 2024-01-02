@@ -3,3 +3,7 @@ __pycache__
 .*.txt
 **.orig
 **secret_key.txt
+**config.yaml
+**plugins.txt
+**media
+**static
