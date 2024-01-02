@@ -146,9 +146,9 @@
 
           text = ''
             INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
-            pushd $INVENTREE_SRC > /dev/null 2>&1
-            python
-            popd > /dev/null 2>&1
+            pushd "$INVENTREE_SRC/''${INVENTREE_PYTHON_CWD:-}"
+            python "$@"
+            popd
           '';
         };
         inventree-gen-secret = with import nixpkgs { inherit system; };
