@@ -151,6 +151,24 @@
             popd
           '';
         };
+        inventree-refresh-users = with import nixpkgs { inherit system; };
+        let
+          refreshScript = pkgs.writeScript "refresh_users.py" (builtins.readFile ./refresh_users.py);
+        in
+        pkgs.writeShellApplication rec {
+          name = "inventree-refresh-users";
+          runtimeInputs = [
+            pythonWithPackages
+            self.packages.${system}.inventree-src
+          ];
+
+          text = ''
+            INVENTREE_SRC=${self.packages.${system}.inventree-src}/src
+            pushd $INVENTREE_SRC/InvenTree > /dev/null 2>&1
+            python ${refreshScript}
+            popd > /dev/null 2>&1
+          '';
+        };
         inventree-gen-secret = with import nixpkgs { inherit system; };
         let
           genScript = pkgs.writeScript "gen_secret_key.py" ''
@@ -193,11 +211,18 @@
       devShell = pkgs.mkShell {
         inputsFrom = [
           self.packages.${system}.inventree-server
-          self.packages.${system}.inventree-cluster
         ];
         nativeBuildInputs = [
           pip2nix.packages.${system}.pip2nix.python39
           pythonWithPackages
+          pkgs.yarn
+          pkgs.yarn2nix
+          self.packages.${system}.inventree-server
+          self.packages.${system}.inventree-cluster
+          self.packages.${system}.inventree-gen-secret
+          self.packages.${system}.inventree-python
+          self.packages.${system}.inventree-invoke
+          self.packages.${system}.inventree-refresh-users
         ];
       };
     });
