@@ -7,4 +7,6 @@ with ps; [
   pgcli
   mysqlclient
   mariadb
+  # https://stackoverflow.com/questions/75495403/django-returns-templatedoesnotexist-when-using-crispy-forms
+  django-crispy-bootstrap4
 ]

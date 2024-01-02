@@ -28,17 +28,41 @@
           pname = "inventree-src";
           inherit version;
 
-          src = pkgs.fetchFromGitHub {
-            owner = "inventree";
-            repo = "InvenTree";
-            rev = version;
-            hash = "sha256-PW/aX8h3W2xcFZ1zfYE9+Uy6bkNrPeoDc48CA70cOhA=";
-          };
+          srcs = [
+            (pkgs.fetchFromGitHub {
+              name = "inventree-src";
+              #owner = "inventree";
+              owner = "Gigahawk";
+              repo = "InvenTree";
+              #rev = version;
+              rev = "27cad60d52a081d3fe2ac12992ea8dc44056b9b3";
+              hash = "sha256-ofbftq80mzA4EWddSbw/DBade0UL/OZIgqt4xUDyHoc=";
+            })
+            (pkgs.fetchzip {
+              name = "inventree-frontend";
+              url = "https://github.com/inventree/InvenTree/releases/download/${version}/frontend-build.zip";
+              hash = "sha256-w4QJ03Bgy9hikrSIaJzqeEwlR+hHkBZ0bljXp+JW56o=";
+              stripRoot=false;
+            })
+          ];
+
+          sourceRoot = ".";
+
+
+          nativeBuildInputs = [
+            pkgs.yarn
+          ];
 
           installPhase = ''
             runHook  preInstall
 
+            pushd inventree-src
             find . -type f -exec install -Dm 755 "{}" "$out/src/{}" \;
+            popd
+
+            pushd inventree-frontend
+            find . -type f -exec install -Dm 755 "{}" "$out/src/InvenTree/web/static/web/{}" \;
+            popd
 
             runHook postInstall
           '';
@@ -100,6 +124,7 @@
         pkgs.writeShellApplication rec {
           name = "inventree-invoke";
           runtimeInputs = [
+            pkgs.yarn
             pythonWithPackages
             self.packages.${system}.inventree-src
           ];
