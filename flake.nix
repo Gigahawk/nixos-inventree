@@ -35,8 +35,8 @@
               owner = "Gigahawk";
               repo = "InvenTree";
               #rev = version;
-              rev = "27cad60d52a081d3fe2ac12992ea8dc44056b9b3";
-              hash = "sha256-ofbftq80mzA4EWddSbw/DBade0UL/OZIgqt4xUDyHoc=";
+              rev = "eb5b161617fc5ff36e91ab007008736b1d37a0d7";
+              hash = "sha256-oTkL7Lu+llj1O23Ql1EQKt24UmTLxJNYT5cJhcEReWQ=";
             })
             (pkgs.fetchzip {
               name = "inventree-frontend";
