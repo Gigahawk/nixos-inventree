@@ -17,7 +17,9 @@
       pkgs = nixpkgs.legacyPackages.${system};
       version = "0.13.0";
 
-      packageOverrides = pkgs.callPackage ./python-overrides.nix { };
+      pythonOverrides = pkgs.callPackage ./python-overrides.nix { };
+      customOverrides = pkgs.callPackage ./custom-overrides.nix { };
+      packageOverrides = nixpkgs.lib.composeManyExtensions [ pythonOverrides customOverrides ];
       python = pkgs.python3.override { inherit packageOverrides; };
       pythonPackages = import ./python-all-requirements.nix;
       pythonWithPackages = python.withPackages pythonPackages;
