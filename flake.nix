@@ -19,9 +19,9 @@
         overlays = [ self.overlays.pip2nix self.overlays.default ];
       };
     in {
-      packages.inventree = {
+      packages = {
         inherit (pkgs.inventree) src server cluster invoke python
-          refresh-users gen-secret;
+          refresh-users gen-secret shell;
         inherit (pkgs) pip2nix;
       };
       devShell = pkgs.inventree.shell;
