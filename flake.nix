@@ -22,12 +22,14 @@
       packages.inventree = {
         inherit (pkgs.inventree) src server cluster invoke python
           refresh-users gen-secret;
+        inherit (pkgs) pip2nix;
       };
       devShell = pkgs.inventree.shell;
     }) // {
       overlays.default = import ./overlay.nix;
       overlays.pip2nix = final: prev: {
-        pip2nix = pip2nix.packages.${prev.system}.pip2nix;
+        # Note: packages.x86_64-linux.pip2nix does not exists.
+        pip2nix = pip2nix.defaultPackage.${prev.system};
       };
 
       nixosModules.default = import ./module.nix;
