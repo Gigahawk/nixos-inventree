@@ -6,7 +6,7 @@ mkShell {
   ];
   nativeBuildInputs = [
     # pip2nix.packages.${system}.
-    pip2nix.python39
+    pip2nix
     inventree.pythonWithPackages
     yarn
     yarn2nix
