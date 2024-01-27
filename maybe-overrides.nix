@@ -1,18 +1,18 @@
 # Extend python packages.
 
 self: super: {
-  buildPythonPackages = pkg:
+  oldBuildPythonPackage = super.buildPythonPackage;
+  buildPythonPackage = pkg:
     let
       oldVersion = super."${pkg.pname or " "}".version or "";
       newVersion = pkg.version;
       newer =
         oldVersion == "" ||
-        builtins.compareVersions newVerison oldVersion > 0;
+        builtins.compareVersions newVersion oldVersion > 0;
     in
       if newer then
-        __trace "${pkg.pname}: ${newVersion} > ${oldVersion}"
-        super.buildPythonPackages pkg
+        # __trace "${pkg.pname}: ${newVersion} > ${oldVersion}"
+        super.buildPythonPackage pkg
       else
-        __trace "${pkg.pname}: ${newVersion} <= ${oldVersion}"
         super."${pkg.pname}";
 }

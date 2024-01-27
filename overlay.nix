@@ -6,7 +6,12 @@ final: prev:
     customOverrides = prev.callPackage ./custom-overrides.nix { };
     pythonBin = prev.python3.override {
       packageOverrides = prev.lib.composeManyExtensions [
-        pythonOverrides customOverrides
+        (import ./maybe-overrides.nix)
+        pythonOverrides
+        customOverrides
+        (self: super: {
+          buildPythonPackage = super.oldBuildPythonPackage;
+        })
       ];
     };
     pythonPackages = import ./python-all-requirements.nix;
