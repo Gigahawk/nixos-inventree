@@ -178,7 +178,9 @@ in
             ${inventree.invoke}/bin/inventree-invoke migrate
 
             echo "Ensuring static files are populated"
-            ${inventree.invoke}/bin/inventree-invoke static
+            pushd ${inventree.src}/static
+            find . -type f -exec install -Dm 644 "{}" "${cfg.config.static_root}/{}" \;
+            popd
 
             echo "Setting up users"
             cat ${usersFile} | \

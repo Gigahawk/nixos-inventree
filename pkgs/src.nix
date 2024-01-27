@@ -1,4 +1,21 @@
-{stdenv, fetchFromGitHub, fetchzip, yarn, lib}:
+{stdenv, fetchFromGitHub, fetchzip, writeScript, yarn, inventree, lib}:
+
+let
+  # invoke command from nixpkgs is a prebuilt binary that appears to
+  # ignore the environment, create our own script to run invoke with
+  # our environment
+  invokeMain = writeScript "invokeMain" ''
+    from invoke import Program, __version__
+
+    program = Program(
+        name="Invoke",
+        binary="inv[oke]",
+        binary_names=["invoke", "inv"],
+        version=__version__,
+    )
+    program.run()
+  '';
+in
 
 stdenv.mkDerivation rec {
   pname = "inventree-src";
@@ -26,7 +43,23 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     yarn
+    inventree.pythonWithPackages
   ];
+
+  buildPhase = ''
+    mkdir src static media backup db
+    cp -r inventree-src/* src/.
+    cp -r inventree-frontend/* src/.
+    export INVENTREE_SRC=$(pwd)/src
+    export INVENTREE_STATIC_ROOT=$(pwd)/static
+    export INVENTREE_MEDIA_ROOT=$(pwd)/media
+    export INVENTREE_BACKUP_DIR=$(pwd)/backup
+    export INVENTREE_DB_ENGINE=sqlite3
+    export INVENTREE_DB_NAME=$(pwd)/db/db.sqlite3
+    pushd $INVENTREE_SRC
+    python ${invokeMain} static
+    popd
+  '';
 
   installPhase = ''
     runHook  preInstall
@@ -38,6 +71,12 @@ stdenv.mkDerivation rec {
     pushd inventree-frontend
     find . -type f -exec install -Dm 755 "{}" "$out/src/InvenTree/web/static/web/{}" \;
     popd
+
+    for d in static media backup db; do
+      pushd $d
+      find . -type f -exec install -Dm 755 "{}" "$out/$d/{}" \;
+      popd
+    done
 
     runHook postInstall
   '';
