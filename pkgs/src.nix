@@ -47,9 +47,24 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = ''
+    build=$(pwd)
     mkdir src static media backup db
-    cp -r inventree-src/* src/.
-    cp -r inventree-frontend/* src/.
+
+    pushd inventree-src
+    find . -type f -exec install -Dm 755 "{}" "$build/src/{}" \;
+    popd
+
+    pushd inventree-frontend
+    find . -type f -exec install -Dm 755 "{}" "$build/src/InvenTree/web/static/web/{}" \;
+    popd
+
+    #cp -r inventree-src/* src/.
+    #cp -r inventree-frontend/* src/.
+
+    # Patch is_ajax method as it has been deprecated in django.
+    # https://docs.djangoproject.com/en/3.1/releases/3.1/#id2
+    find ./src -name \*.py -exec sed -ie 's,.is_ajax(),.headers.get("x-requested-with") == "XMLHttpRequest",g' "{}" \;
+
     export INVENTREE_SRC=$(pwd)/src
     export INVENTREE_STATIC_ROOT=$(pwd)/static
     export INVENTREE_MEDIA_ROOT=$(pwd)/media
@@ -64,12 +79,8 @@ stdenv.mkDerivation rec {
   installPhase = ''
     runHook  preInstall
 
-    pushd inventree-src
+    pushd ./src
     find . -type f -exec install -Dm 755 "{}" "$out/src/{}" \;
-    popd
-
-    pushd inventree-frontend
-    find . -type f -exec install -Dm 755 "{}" "$out/src/InvenTree/web/static/web/{}" \;
     popd
 
     for d in static media backup db; do
