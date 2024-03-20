@@ -283,6 +283,27 @@
               '';
             };
 
+            serverStartTimeout = mkOption {
+              type = types.str;
+              # Allow for long migrations to run properly
+              default = "10min";
+              description = lib.mdDoc ''
+                TimeoutStartSec for the server systemd service.
+                See https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#TimeoutStartSec=
+                for more details
+              '';
+            };
+
+            serverStopTimeout = mkOption {
+              type = types.str;
+              default = "5min";
+              description = lib.mdDoc ''
+                TimeoutStopSec for the server systemd service.
+                See https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#TimeoutStopSec=
+                for more details
+              '';
+            };
+
             configPath = mkOption {
               type = types.str;
               default = cfg.dataDir + "/config.yaml";
@@ -370,6 +391,8 @@
               serviceConfig = {
                 User = defaultUser;
                 Group = defaultGroup;
+                TimeoutStartSec = cfg.serverStartTimeout;
+                TimeoutStopSec= cfg.serverStopTimeout;
                 ExecStartPre =
                   "+${pkgs.writers.writeBash "inventree-setup" ''
                     echo "Creating config file"
