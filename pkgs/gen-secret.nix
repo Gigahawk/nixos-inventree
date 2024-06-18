@@ -17,7 +17,7 @@ writeShellApplication rec {
   ];
 
   text = ''
-    INVENTREE_SRC=${inventree.src}/src
+    INVENTREE_SRC=${inventree.src}/src/src/backend
     INVENTREE_CONFIG_FILE="$(pwd)/config.yaml"
     export INVENTREE_CONFIG_FILE
     INVENTREE_SECRET_KEY_FILE="$(pwd)/secret_key.txt"

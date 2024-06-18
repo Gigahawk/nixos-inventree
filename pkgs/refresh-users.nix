@@ -12,7 +12,7 @@ writeShellApplication rec {
   ];
 
   text = ''
-    INVENTREE_SRC=${inventree.src}/src
+    INVENTREE_SRC=${inventree.src}/src/src/backend
     pushd $INVENTREE_SRC/InvenTree > /dev/null 2>&1
     python ${refreshScript}
     popd > /dev/null 2>&1

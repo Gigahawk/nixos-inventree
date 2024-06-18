@@ -8,7 +8,7 @@ writeShellApplication rec {
   ];
 
   text = ''
-    INVENTREE_SRC=${inventree.src}/src
+    INVENTREE_SRC=${inventree.src}/src/src/backend
     pushd "$INVENTREE_SRC/''${INVENTREE_PYTHON_CWD:-}"
     python "$@"
     popd

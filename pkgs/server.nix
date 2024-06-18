@@ -8,7 +8,7 @@ writeShellApplication rec {
   ];
 
   text = ''
-    INVENTREE_SRC=${inventree.src}/src
+    INVENTREE_SRC=${inventree.src}/src/src/backend
     pushd $INVENTREE_SRC/InvenTree
     gunicorn -c gunicorn.conf.py InvenTree.wsgi "$@"
     popd
