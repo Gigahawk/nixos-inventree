@@ -14,6 +14,7 @@ with ps; [
   cryptography
   cssselect2
   defusedxml
+  deprecated
   diff-match-patch
   dj-rest-auth
   django
@@ -55,6 +56,8 @@ with ps; [
   et-xmlfile
   feedparser
   fonttools
+  googleapis-common-protos
+  grpcio
   gunicorn
   html5lib
   icalendar
@@ -71,10 +74,27 @@ with ps; [
   oauthlib
   odfpy
   openpyxl
+  opentelemetry-api
+  opentelemetry-exporter-otlp
+  opentelemetry-exporter-otlp-proto-common
+  opentelemetry-exporter-otlp-proto-grpc
+  opentelemetry-exporter-otlp-proto-http
+  opentelemetry-instrumentation
+  opentelemetry-instrumentation-django
+  opentelemetry-instrumentation-redis
+  opentelemetry-instrumentation-requests
+  opentelemetry-instrumentation-wsgi
+  opentelemetry-proto
+  opentelemetry-sdk
+  opentelemetry-semantic-conventions
+  opentelemetry-util-http
   packaging
   pdf2image
   pillow
   pint
+  pip-licenses
+  prettytable
+  protobuf
   py-moneyed
   pycparser
   pydyf
@@ -97,6 +117,7 @@ with ps; [
   requests-oauthlib
   rpds-py
   sentry-sdk
+  setuptools
   sgmllib3k
   six
   sqlparse
@@ -105,8 +126,11 @@ with ps; [
   typing-extensions
   uritemplate
   urllib3
+  wcwidth
   weasyprint
   webencodings
+  whitenoise
+  wrapt
   xlrd
   xlwt
   zipp

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from pathlib import Path
 
-BASE_REQUIREMENTS = Path("InvenTree/requirements.txt")
+BASE_REQUIREMENTS = Path("InvenTree/src/backend/requirements.txt")
 OUTPUT = Path("python-requirements.nix")
 
 def get_requirements_list():
@@ -9,7 +9,8 @@ def get_requirements_list():
         lines = f.readlines()
     cleaned_lines = []
     for line in lines:
-        if not line.strip() or line.strip().startswith("#"):
+        _l = line.strip()
+        if not _l or _l.startswith("#") or _l.startswith("--hash"):
             continue
         idx = line.index("=")
         try:
