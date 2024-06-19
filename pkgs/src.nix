@@ -58,7 +58,7 @@ stdenv.mkDerivation rec {
     popd
 
     pushd inventree-frontend
-    find . -type f -exec install -Dm 755 "{}" "$build/src/InvenTree/web/static/web/{}" \;
+    find . -type f -exec install -Dm 755 "{}" "$build/src/src/backend/InvenTree/web/static/web/{}" \;
     popd
 
     #cp -r inventree-src/* src/.
