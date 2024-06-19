@@ -37,6 +37,11 @@ stdenv.mkDerivation rec {
     })
   ];
 
+  patches = [
+    ../patches/install-crispy-bootstrap4.patch
+    ../patches/configurable-static-i18-root.patch
+  ];
+
   sourceRoot = ".";
 
   nativeBuildInputs = [
@@ -63,10 +68,6 @@ stdenv.mkDerivation rec {
     # https://docs.djangoproject.com/en/3.1/releases/3.1/#id2
     find ./src -name \*.py -exec sed -ie 's,.is_ajax(),.headers.get("x-requested-with") == "XMLHttpRequest",g' "{}" \;
 
-    # Add crispy_bootstrap4 to resolve
-    # https://stackoverflow.com/questions/75495403/django-returns-templatedoesnotexist-when-using-crispy-forms
-    sed -i "s|'crispy_forms',|'crispy_forms', 'crispy_bootstrap4',|" ./src/src/backend/InvenTree/InvenTree/settings.py
-
     export INVENTREE_SRC=$(pwd)/src
     export INVENTREE_STATIC_ROOT=$(pwd)/static
     export INVENTREE_MEDIA_ROOT=$(pwd)/media
@@ -76,6 +77,10 @@ stdenv.mkDerivation rec {
     pushd $INVENTREE_SRC
     python ${invokeMain} static
     popd
+
+    # Patch out invoke tasks that will attempt to mutate the nix store
+    # after we generate the files
+    patch -p1 < ${../patches/disable-fs-mutation-tasks.patch}
   '';
 
   installPhase = ''
