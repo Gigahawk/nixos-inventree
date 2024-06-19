@@ -160,23 +160,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    services.inventree.config = {
-      # Static File Storage, updated when the server starts.
-      static_root = "${cfg.dataDir}/static_root";
-
-      # Uploaded File Storage.
-      media_root = "${cfg.dataDir}/media_root";
-
-      # Backup directory.
-      backup_dir = "${cfg.dataDir}/backup_dir";
-
-      # Provide a simple database setup as a default.
-      database = {
-        ENGINE = "sqlite3";
-        NAME = "${cfg.dataDir}/database.sqlite3";
-      };
-    };
-
     nixpkgs.overlays = [ (import ./overlay.nix) ];
 
     environment.systemPackages = [
