@@ -31,8 +31,10 @@ stdenv.mkDerivation rec {
     })
     (fetchzip {
       name = "inventree-frontend";
-      url = "https://github.com/inventree/InvenTree/releases/download/${version}/frontend-build.zip";
-      hash = "sha256-KCyGIFxTvUpnb7n3o1Vj0gwt2+VlDOc3LARfKzKGWi4=";
+      # HACK: workaround inventree/InvenTree#7476
+      #url = "https://github.com/inventree/InvenTree/releases/download/${version}/frontend-build.zip";
+      url = "https://github.com/Gigahawk/InvenTree/releases/download/0.15.4-frontend-vite/frontend-build.zip";
+      hash = "sha256-Lf9TICJTNZa4SzrNNYJHNGFWQBJNCCDxGAQD03hLVo8=";
       stripRoot=false;
     })
   ];
@@ -60,6 +62,7 @@ stdenv.mkDerivation rec {
     pushd inventree-frontend
     find . -type f -exec install -Dm 755 "{}" "$build/src/src/backend/InvenTree/web/static/web/{}" \;
     popd
+
 
     #cp -r inventree-src/* src/.
     #cp -r inventree-frontend/* src/.
