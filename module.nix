@@ -163,7 +163,15 @@ in
     nixpkgs.overlays = [ (import ./overlay.nix) ];
 
     environment.systemPackages = [
-      inventree.invoke
+      (pkgs.symlinkJoin {
+        name = "inventree-invoke";
+        paths = [ inventree.invoke ];
+        buildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/inventree-invoke \
+            --set INVENTREE_CONFIG_FILE ${toString cfg.configPath}
+        '';
+      })
     ];
 
     users.users.${defaultUser} = {
