@@ -2,7 +2,9 @@
   description = "Devshell and package definition";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    #nixpkgs.url = "nixpkgs/nixos-unstable";
+    # https://github.com/NixOS/nixpkgs/pull/373988
+    nixpkgs.url = "github:Gigahawk/nixpkgs/django-q2-fix-nixos-unstable";
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
