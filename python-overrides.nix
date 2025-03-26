@@ -245,6 +245,7 @@ self: super: {
     };
     format = "wheel";
     doCheck = false;
+    doInstallCheck = false;
     buildInputs = [];
     checkInputs = [];
     nativeBuildInputs = [];

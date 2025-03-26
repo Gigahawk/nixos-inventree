@@ -19,7 +19,7 @@ with ps; [
   dj-rest-auth
   django
   django-allauth
-  #django-allauth-2fa
+  django-allauth-2fa
   django-cleanup
   django-cors-headers
   django-crispy-forms
