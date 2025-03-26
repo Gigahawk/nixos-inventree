@@ -3,8 +3,7 @@
 
   inputs = {
     # django-allauth-2fa has been removed from unstable
-    #nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixpkgs.url = "nixpkgs/nixos-24.11";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils = {
       url = "github:numtide/flake-utils";
     };

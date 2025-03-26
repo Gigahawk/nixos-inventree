@@ -4,7 +4,8 @@ self: super: {
   oldBuildPythonPackage = super.buildPythonPackage;
   buildPythonPackage = pkg:
     let
-      oldVersion = super."${pkg.pname or " "}".version or "";
+      oldVersionSafe = builtins.tryEval (super."${pkg.pname or " "}".version or "");
+      oldVersion = if oldVersionSafe.success then oldVersionSafe.value else "";
       newVersion = pkg.version;
       newer =
         oldVersion == "" ||
