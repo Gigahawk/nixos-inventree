@@ -1,4 +1,4 @@
-{writeShellApplication, writeScript, yarn, inventree}:
+{writeShellApplication, writeScript, yarn, pythonWithPackages, src}:
 
 let
   # invoke command from nixpkgs is a prebuilt binary that appears to
@@ -21,12 +21,12 @@ writeShellApplication rec {
   name = "inventree-invoke";
   runtimeInputs = [
     yarn
-    inventree.pythonWithPackages
-    inventree.src
+    pythonWithPackages
+    src
   ];
 
   text = ''
-    INVENTREE_SRC=${inventree.src}/src
+    INVENTREE_SRC=${src}/src
     pushd $INVENTREE_SRC > /dev/null 2>&1
     python ${invokeMain} "$@"
     popd > /dev/null 2>&1

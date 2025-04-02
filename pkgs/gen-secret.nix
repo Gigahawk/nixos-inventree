@@ -1,4 +1,4 @@
-{writeShellApplication, writeScript, inventree}:
+{writeShellApplication, writeScript, pythonWithPackages, src}:
 
 let
   genScript = writeScript "gen_secret_key.py" ''
@@ -12,12 +12,12 @@ in
 writeShellApplication rec {
   name = "inventree-gen-secret";
   runtimeInputs = [
-    inventree.pythonWithPackages
-    inventree.src
+    pythonWithPackages
+    src
   ];
 
   text = ''
-    INVENTREE_SRC=${inventree.src}/src/src/backend
+    INVENTREE_SRC=${src}/src/src/backend
     INVENTREE_CONFIG_FILE="$(pwd)/config.yaml"
     export INVENTREE_CONFIG_FILE
     INVENTREE_SECRET_KEY_FILE="$(pwd)/secret_key.txt"
