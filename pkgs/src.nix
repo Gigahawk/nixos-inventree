@@ -1,4 +1,4 @@
-{stdenv, fetchFromGitHub, fetchzip, writeScript, yarn, inventree, lib}:
+{stdenv, fetchFromGitHub, fetchzip, writeScript, yarn, pythonWithPackages, lib}:
 
 let
   # invoke command from nixpkgs is a prebuilt binary that appears to
@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     yarn
-    inventree.pythonWithPackages
+    pythonWithPackages
   ];
 
   buildPhase = ''
