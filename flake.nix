@@ -137,7 +137,7 @@
             cluster
             invoke
             python
-            refresh-users
+            refresh-db-config
             gen-secret
             shell
             ;
@@ -182,7 +182,7 @@
             cluster = _self.callPackage ./pkgs/cluster.nix { };
             invoke = _self.callPackage ./pkgs/invoke.nix { };
             python = _self.callPackage ./pkgs/python.nix { };
-            refresh-users = _self.callPackage ./pkgs/refresh-users.nix { };
+            refresh-db-config = _self.callPackage ./pkgs/refresh-db-config.nix { };
             gen-secret = _self.callPackage ./pkgs/gen-secret.nix { };
 
             # Requires pip2nix overlay, which is managed by the flake.
@@ -205,7 +205,9 @@
           defaultUser = "inventree";
           defaultGroup = defaultUser;
           configFile = pkgs.writeText "config.yaml" (builtins.toJSON cfg.config);
-          usersFile = pkgs.writeText "users.json" (builtins.toJSON cfg.users);
+          dbConfigFile = pkgs.writeText "users.json" (builtins.toJSON {
+            inherit (cfg) users systemSettings;
+          });
           inventree = pkgs.inventree;
           serverBind = "${cfg.bindIp}:${toString cfg.bindPort}";
           allowedHostsStr = concatStringsSep "," cfg.allowedHosts;
@@ -366,10 +368,21 @@
               '';
             };
 
+            systemSettings = mkOption {
+              type = types.attrsOf types.anything;
+              default = {};
+              description = lib.mdDoc ''
+                System settings, see https://docs.inventree.org/en/stable/settings/global/
+                and https://github.com/inventree/InvenTree/blob/master/src/backend/InvenTree/common/setting/system.py
+                for details
+              '';
+            };
+
             users = mkOption {
               default = { };
               description = mdDoc ''
                 Users which should be present on the InvenTree server
+                If specified, ALL OTHER USERS WILL BE DELETED
               '';
               example = {
                 admin = {
@@ -468,9 +481,9 @@
                   find . -type f -exec install -Dm 644 "{}" "${cfg.config.static_root}/{}" \;
                   popd
 
-                  echo "Setting up users"
-                  cat ${usersFile} | \
-                    ${inventree.refresh-users}/bin/inventree-refresh-users
+                  echo "Setting up users and system settings"
+                  cat ${dbConfigFile} | \
+                    ${inventree.refresh-db-config}/bin/inventree-refresh-db-config
                 ''}";
                 ExecStart = ''
                   ${inventree.server}/bin/inventree-server -b ${serverBind}
