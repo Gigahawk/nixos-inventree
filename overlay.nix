@@ -4,7 +4,7 @@ final: prev:
   inventree = rec {
     pythonOverrides = prev.callPackage ./python-overrides.nix { };
     customOverrides = prev.callPackage ./custom-overrides.nix { };
-    pythonBin = prev.python3.override {
+    pythonBin = prev.python312.override {
       packageOverrides = prev.lib.composeManyExtensions [
         (import ./maybe-overrides.nix)
         pythonOverrides
