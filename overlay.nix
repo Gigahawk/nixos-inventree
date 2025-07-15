@@ -1,10 +1,11 @@
 final: prev:
 
 {
+
   inventree = final.lib.makeScope final.newScope (self: {
     pythonOverrides = self.callPackage ./python-overrides.nix { };
     customOverrides = self.callPackage ./custom-overrides.nix { };
-    pythonBin = self.callPackage ({python3}: python3.override {
+    pythonBin = self.callPackage ({python312}: python312.override {
       packageOverrides = final.lib.composeManyExtensions [
         (import ./maybe-overrides.nix)
         self.pythonOverrides
