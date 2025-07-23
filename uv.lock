@@ -300,16 +300,16 @@ sdist = { url = "https://files.pythonhosted.org/packages/0f/df/cbc91558bf0cc82b8
 
 [[package]]
 name = "django"
-version = "4.2.12"
+version = "4.2.14"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a7/d6/eafd33980fb7a3072665ba26a3099b7032210be82edca0abd271e983372e/Django-4.2.12.tar.gz", hash = "sha256:6a6b4aff8a2db2dc7dcc5650cb2c7a7a0d1eb38e2aa2335fdf001e41801e9797", size = 10498118, upload-time = "2024-05-06T16:41:21.084Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/17/68/e228cbcafbed036060e53535d172d3795456e31c27d7c80dbc708de95de7/Django-4.2.14.tar.gz", hash = "sha256:fc6919875a6226c7ffcae1a7d51e0f2ceaf6f160393180818f6c95f51b1e7b96", size = 10432993, upload-time = "2024-07-09T14:03:16.237Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/b3/4462fc6d771763a273590ecd6e535f284e057f5b8cc1dd41fca774b1072c/Django-4.2.12-py3-none-any.whl", hash = "sha256:7640e86835d44ae118c2916a803d8081f40e214ee18a5a92a0202994ca60a4b4", size = 8024871, upload-time = "2024-05-06T16:41:14.599Z" },
+    { url = "https://files.pythonhosted.org/packages/70/be/04a395243beed12454c0b9652686f9e8abf11d57ba23213e5bcabdceb7a6/Django-4.2.14-py3-none-any.whl", hash = "sha256:3ec32bc2c616ab02834b9cac93143a7dc1cdcd5b822d78ac95fc20a38c534240", size = 7992509, upload-time = "2024-07-09T14:03:07.782Z" },
 ]
 
 [[package]]
@@ -1154,7 +1154,7 @@ requires-dist = [
     { name = "deprecated", specifier = "==1.2.14" },
     { name = "diff-match-patch", specifier = "==20230430" },
     { name = "dj-rest-auth", specifier = "==6.0.0" },
-    { name = "django", specifier = "==4.2.12" },
+    { name = "django", specifier = "==4.2.14" },
     { name = "django-allauth", specifier = "==0.61.1" },
     { name = "django-allauth-2fa", specifier = "==0.11.1" },
     { name = "django-cleanup", specifier = "==8.1.0" },

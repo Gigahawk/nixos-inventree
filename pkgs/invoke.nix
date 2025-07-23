@@ -1,4 +1,4 @@
-{writeShellApplication, writeScript, yarn, pythonWithPackages, src}:
+{writeShellApplication, writeScript, yarn, bash, pythonWithPackages, src}:
 
 let
   # invoke command from nixpkgs is a prebuilt binary that appears to
@@ -23,6 +23,7 @@ writeShellApplication rec {
     yarn
     pythonWithPackages
     src
+    bash
   ];
 
   text = ''

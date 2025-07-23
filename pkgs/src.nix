@@ -19,7 +19,7 @@ in
 
 stdenv.mkDerivation rec {
   pname = "inventree-src";
-  version = "0.15.4";
+  version = "0.15.8";
 
   srcs = [
     (fetchFromGitHub {
@@ -27,14 +27,12 @@ stdenv.mkDerivation rec {
       owner = "inventree";
       repo = "InvenTree";
       rev = version;
-      hash = "sha256-L2CjSLnbJuik4I/I3fqtksAEK/+SiDDdJTYAbam7Jh4=";
+      hash = "sha256-XY+s4LX3Tf56lrZ088Quff8fTmaoDw2s7yNfUkeCQfM=";
     })
     (fetchzip {
       name = "inventree-frontend";
-      # HACK: workaround inventree/InvenTree#7476
-      #url = "https://github.com/inventree/InvenTree/releases/download/${version}/frontend-build.zip";
-      url = "https://github.com/Gigahawk/InvenTree/releases/download/0.15.4-frontend-vite/frontend-build.zip";
-      hash = "sha256-Lf9TICJTNZa4SzrNNYJHNGFWQBJNCCDxGAQD03hLVo8=";
+      url = "https://github.com/inventree/InvenTree/releases/download/${version}/frontend-build.zip";
+      hash = "sha256-wM0/06eLAY6faCZiHslPnQi+WOlOo3AuvGqV3rcNbso=";
       stripRoot=false;
     })
   ];
