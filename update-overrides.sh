@@ -30,6 +30,9 @@ uv add "invoke @ git+https://github.com/pyinvoke/invoke"
 
 uv add crispy-bootstrap4
 
+# Related to plugins
+uv add pip
+
 ## Weasyprint deps?
 #uv add tinyhtml5
 #uv add "tinycss2 >= 1.4.0"
