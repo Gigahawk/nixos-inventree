@@ -10,6 +10,7 @@ dependencies = [
     "attrs==24.2.0",
     "babel==2.16.0",
     "bleach[css]==6.2.0",
+    "blessed==1.21.0",
     "brotli==1.1.0",
     "certifi==2024.8.30",
     "cffi==1.17.1",
