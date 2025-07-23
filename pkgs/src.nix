@@ -52,13 +52,16 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = ''
+    echo "Creating build dirs"
     build=$(pwd)
     mkdir src static media backup db
 
+    echo "Installing backend source files"
     pushd inventree-src
     find . -type f -exec install -Dm 755 "{}" "$build/src/{}" \;
     popd
 
+    echo "Installing frontend source files"
     pushd inventree-frontend
     find . -type f -exec install -Dm 755 "{}" "$build/src/src/backend/InvenTree/web/static/web/{}" \;
     popd
@@ -67,10 +70,12 @@ stdenv.mkDerivation rec {
     #cp -r inventree-src/* src/.
     #cp -r inventree-frontend/* src/.
 
+    echo "Patching deprecated django calls"
     # Patch is_ajax method as it has been deprecated in django.
     # https://docs.djangoproject.com/en/3.1/releases/3.1/#id2
     find ./src -name \*.py -exec sed -ie 's,.is_ajax(),.headers.get("x-requested-with") == "XMLHttpRequest",g' "{}" \;
 
+    echo "Building static files"
     export INVENTREE_SRC=$(pwd)/src
     export INVENTREE_STATIC_ROOT=$(pwd)/static
     export INVENTREE_MEDIA_ROOT=$(pwd)/media
@@ -81,6 +86,7 @@ stdenv.mkDerivation rec {
     python ${invokeMain} static
     popd
 
+    echo "Disabling fs mutation tasks"
     # Patch out invoke tasks that will attempt to mutate the nix store
     # after we generate the files
     patch -p1 < ${../patches/disable-fs-mutation-tasks.patch}
