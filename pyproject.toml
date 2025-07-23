@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "asgiref==3.8.1",
-    "async-timeout==4.0.3",
+    "async-timeout==5.0.1",
     "attrs==23.2.0",
     "babel==2.15.0",
     "bleach[css]==6.1.0",
@@ -121,7 +121,6 @@ dependencies = [
     "rapidfuzz==3.9.3",
     "redis==5.0.7",
     "referencing==0.35.1",
-    "regex==2024.4.28",
     "requests==2.32.3",
     "rpds-py==0.18.1",
     "sentry-sdk==2.8.0",
