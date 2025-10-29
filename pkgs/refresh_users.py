@@ -32,8 +32,6 @@ def _get_user_data():
         with open(password_file, "r") as f:
             # Strip leading/trailing whitespace from password
             fields["password"] = f.read().strip()
-    # TODO: REMOVE THIS
-    print(data)
     return data
 
 
