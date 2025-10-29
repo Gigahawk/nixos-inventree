@@ -32,165 +32,175 @@
     };
   };
 
-  outputs = {
-    self, nixpkgs, flake-utils,
-    pyproject-nix, uv2nix, pyproject-build-systems,
-    nixpkgs-weasyprint,
-    ...
-  }:
-    flake-utils.lib.eachDefaultSystem (system:
-    let
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ self.overlays.default ];
-      };
-      pkgs-weasyprint = import nixpkgs-weasyprint {
-        inherit system;
-      };
-      inherit (nixpkgs) lib;
-      python = pkgs.python312;
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      pyproject-nix,
+      uv2nix,
+      pyproject-build-systems,
+      nixpkgs-weasyprint,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ self.overlays.default ];
+        };
+        pkgs-weasyprint = import nixpkgs-weasyprint {
+          inherit system;
+        };
+        inherit (nixpkgs) lib;
+        python = pkgs.python312;
 
-      hacks = pkgs.callPackage pyproject-nix.build.hacks { };
+        hacks = pkgs.callPackage pyproject-nix.build.hacks { };
 
-      workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
+        workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
 
-      overlay = workspace.mkPyprojectOverlay {
-        sourcePreference = "wheel";
-      };
-
-      pyprojectOverrides = final: prev: {
-        weasyprint = hacks.nixpkgsPrebuilt {
-          from = pkgs-weasyprint.python312.pkgs.weasyprint;
+        overlay = workspace.mkPyprojectOverlay {
+          sourcePreference = "wheel";
         };
 
-        django-allauth = prev.django-allauth.overrideAttrs (old: {
-          buildInputs = (
-            old.buildInputs or [ ]
-          ) ++ [
-            prev.setuptools
-            prev.wheel
-          ];
-        });
-
-        django-xforwardedfor-middleware = prev.django-xforwardedfor-middleware.overrideAttrs (old: {
-          buildInputs = (
-            old.buildInputs or [ ]
-          ) ++ [
-            prev.setuptools
-            prev.wheel
-          ];
-        });
-
-        dj-rest-auth = prev.dj-rest-auth.overrideAttrs (old: {
-          buildInputs = (
-            old.buildInputs or [ ]
-          ) ++ [
-            prev.setuptools
-            prev.wheel
-          ];
-        });
-
-        odfpy = prev.odfpy.overrideAttrs (old: {
-          buildInputs = (
-            old.buildInputs or [ ]
-          ) ++ [
-            prev.setuptools
-            prev.wheel
-          ];
-        });
-
-        sgmllib3k = prev.sgmllib3k.overrideAttrs (old: {
-          buildInputs = (
-            old.buildInputs or [ ]
-          ) ++ [
-            prev.setuptools
-            prev.wheel
-          ];
-        });
-
-        coreschema = prev.coreschema.overrideAttrs (old: {
-          buildInputs = (
-            old.buildInputs or [ ]
-          ) ++ [
-            prev.setuptools
-            prev.wheel
-          ];
-        });
-
-        invoke = prev.invoke.overrideAttrs (old: {
-          buildInputs = (
-            old.buildInputs or [ ]
-          ) ++ [
-            prev.setuptools
-            prev.wheel
-          ];
-        });
-      };
-
-      pythonSet =
-        (pkgs.callPackage pyproject-nix.build.packages {
-          inherit python;
-        }).overrideScope
-          (
-            lib.composeManyExtensions [
-              pyproject-build-systems.overlays.default
-              overlay
-              pyprojectOverrides
-            ]
-          );
-    in {
-      packages = {
-        inherit (pkgs.inventree) src server cluster invoke python
-          refresh-users gen-secret shell;
-        venv = pythonSet.mkVirtualEnv "inventree-python" workspace.deps.default;
-      };
-      devShells = {
-        default = pkgs.inventree.shell;
-        uv = pkgs.mkShell {
-          packages = [
-            pkgs.uv
-          ];
-          env = {
-            # Don't create venv using uv
-            UV_NO_SYNC = "1";
-
-            # Force uv to use nixpkgs Python interpreter
-            UV_PYTHON = python.interpreter;
-
-            # Prevent uv from downloading managed Python's
-            UV_PYTHON_DOWNLOADS = "never";
+        pyprojectOverrides = final: prev: {
+          weasyprint = hacks.nixpkgsPrebuilt {
+            from = pkgs-weasyprint.python312.pkgs.weasyprint;
           };
 
-          shellHook = ''
-            # Undo dependency propagation by nixpkgs.
-            unset PYTHONPATH
+          django-allauth = prev.django-allauth.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
 
-            # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
-            export REPO_ROOT=$(git rev-parse --show-toplevel)
-          '';
+          django-xforwardedfor-middleware = prev.django-xforwardedfor-middleware.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
+
+          dj-rest-auth = prev.dj-rest-auth.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
+
+          odfpy = prev.odfpy.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
+
+          sgmllib3k = prev.sgmllib3k.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
+
+          coreschema = prev.coreschema.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
+
+          invoke = prev.invoke.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
         };
-      };
-    }) // {
-      overlays.default = (final: prev:
-        {
+
+        pythonSet =
+          (pkgs.callPackage pyproject-nix.build.packages {
+            inherit python;
+          }).overrideScope
+            (
+              lib.composeManyExtensions [
+                pyproject-build-systems.overlays.default
+                overlay
+                pyprojectOverrides
+              ]
+            );
+      in
+      {
+        formatter = pkgs.nixfmt-tree;
+        packages = {
+          inherit (pkgs.inventree)
+            src
+            server
+            cluster
+            invoke
+            python
+            refresh-users
+            gen-secret
+            shell
+            ;
+          venv = pythonSet.mkVirtualEnv "inventree-python" workspace.deps.default;
+        };
+        devShells = {
+          default = pkgs.inventree.shell;
+          uv = pkgs.mkShell {
+            packages = [
+              pkgs.uv
+            ];
+            env = {
+              # Don't create venv using uv
+              UV_NO_SYNC = "1";
+
+              # Force uv to use nixpkgs Python interpreter
+              UV_PYTHON = python.interpreter;
+
+              # Prevent uv from downloading managed Python's
+              UV_PYTHON_DOWNLOADS = "never";
+            };
+
+            shellHook = ''
+              # Undo dependency propagation by nixpkgs.
+              unset PYTHONPATH
+
+              # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+            '';
+          };
+        };
+      }
+    )
+    // {
+      overlays.default = (
+        final: prev: {
           inventree = final.lib.makeScope final.newScope (_self: {
             pythonWithPackages = self.packages.${prev.system}.venv;
 
-            src = _self.callPackage ./pkgs/src.nix {};
-            server = _self.callPackage ./pkgs/server.nix {};
-            cluster = _self.callPackage ./pkgs/cluster.nix {};
-            invoke = _self.callPackage ./pkgs/invoke.nix {};
-            python = _self.callPackage ./pkgs/python.nix {};
-            refresh-users = _self.callPackage ./pkgs/refresh-users.nix {};
-            gen-secret = _self.callPackage ./pkgs/gen-secret.nix {};
+            src = _self.callPackage ./pkgs/src.nix { };
+            server = _self.callPackage ./pkgs/server.nix { };
+            cluster = _self.callPackage ./pkgs/cluster.nix { };
+            invoke = _self.callPackage ./pkgs/invoke.nix { };
+            python = _self.callPackage ./pkgs/python.nix { };
+            refresh-users = _self.callPackage ./pkgs/refresh-users.nix { };
+            gen-secret = _self.callPackage ./pkgs/gen-secret.nix { };
 
             # Requires pip2nix overlay, which is managed by the flake.
-            shell = _self.callPackage ./pkgs/shell.nix {};
+            shell = _self.callPackage ./pkgs/shell.nix { };
           });
         }
       );
 
-      nixosModules.default = { lib, pkgs, config, ... }:
+      nixosModules.default =
+        {
+          lib,
+          pkgs,
+          config,
+          ...
+        }:
         with lib;
         let
           cfg = config.services.inventree;
@@ -202,33 +212,37 @@
           inventree = pkgs.inventree;
 
           # Pre-compute SystemdDirectories to create the directories if they do not exists.
-          singletonIfPrefix = prefix: str:
-            optional (hasPrefix prefix str) (removePrefix prefix str);
+          singletonIfPrefix = prefix: str: optional (hasPrefix prefix str) (removePrefix prefix str);
 
-          systemdDir = prefix: concatStringsSep " " ([]
-            ++ (singletonIfPrefix prefix cfg.dataDir)
-            ++ (singletonIfPrefix prefix cfg.config.static_root)
-            ++ (singletonIfPrefix prefix cfg.config.media_root)
-            ++ (singletonIfPrefix prefix cfg.config.backup_dir)
-          );
+          systemdDir =
+            prefix:
+            concatStringsSep " " (
+              [ ]
+              ++ (singletonIfPrefix prefix cfg.dataDir)
+              ++ (singletonIfPrefix prefix cfg.config.static_root)
+              ++ (singletonIfPrefix prefix cfg.config.media_root)
+              ++ (singletonIfPrefix prefix cfg.config.backup_dir)
+            );
 
-          maybeSystemdDir = prefix:
-            let dirs = systemdDir prefix; in
+          maybeSystemdDir =
+            prefix:
+            let
+              dirs = systemdDir prefix;
+            in
             mkIf (dirs != "") dirs;
 
           systemdDirectories = {
-            RuntimeDirectory= maybeSystemdDir "/run/";
-            StateDirectory= maybeSystemdDir "/var/lib/";
-            CacheDirectory= maybeSystemdDir "/var/cache/";
-            LogsDirectory= maybeSystemdDir "/var/log/";
-            ConfigurationDirectory= maybeSystemdDir "/etc/";
+            RuntimeDirectory = maybeSystemdDir "/run/";
+            StateDirectory = maybeSystemdDir "/var/lib/";
+            CacheDirectory = maybeSystemdDir "/var/cache/";
+            LogsDirectory = maybeSystemdDir "/var/log/";
+            ConfigurationDirectory = maybeSystemdDir "/etc/";
           };
         in
 
         {
           options.services.inventree = {
-            enable = mkEnableOption
-              (lib.mdDoc "Open Source Inventory Management System");
+            enable = mkEnableOption (lib.mdDoc "Open Source Inventory Management System");
 
             #user = mkOption {
             #  type = types.str;
@@ -301,7 +315,7 @@
 
             config = mkOption {
               type = types.attrs;
-              default = {};
+              default = { };
               description = lib.mdDoc ''
                 Config options, see https://docs.inventree.org/en/stable/start/config/
                 for details
@@ -309,7 +323,7 @@
             };
 
             users = mkOption {
-              default = {};
+              default = { };
               description = mdDoc ''
                 Users which should be present on the InvenTree server
               '';
@@ -320,33 +334,38 @@
                   password_file = /path/to/passwordfile;
                 };
               };
-              type = types.attrsOf (types.submodule ({ name, ... }: {
-                freeformType = settingsFormat.type;
-                options = {
-                  name = mkOption {
-                    type = types.str;
-                    default = name;
-                    description = lib.mdDoc ''
-                      The name of the user
-                    '';
-                  };
+              type = types.attrsOf (
+                types.submodule (
+                  { name, ... }:
+                  {
+                    freeformType = settingsFormat.type;
+                    options = {
+                      name = mkOption {
+                        type = types.str;
+                        default = name;
+                        description = lib.mdDoc ''
+                          The name of the user
+                        '';
+                      };
 
-                  password_file = mkOption {
-                    type = types.path;
-                    description = lib.mdDoc ''
-                      The path to the password file for the user
-                    '';
-                  };
+                      password_file = mkOption {
+                        type = types.path;
+                        description = lib.mdDoc ''
+                          The path to the password file for the user
+                        '';
+                      };
 
-                  is_superuser = mkOption {
-                    type = types.bool;
-                    default = false;
-                    description = lib.mdDoc ''
-                      Set to true to create the account as a superuser
-                    '';
-                  };
-                };
-              }));
+                      is_superuser = mkOption {
+                        type = types.bool;
+                        default = false;
+                        description = lib.mdDoc ''
+                          Set to true to create the account as a superuser
+                        '';
+                      };
+                    };
+                  }
+                )
+              );
             };
           };
 
@@ -389,25 +408,24 @@
                 User = defaultUser;
                 Group = defaultGroup;
                 TimeoutStartSec = cfg.serverStartTimeout;
-                TimeoutStopSec= cfg.serverStopTimeout;
-                ExecStartPre =
-                  "+${pkgs.writers.writeBash "inventree-setup" ''
-                    echo "Creating config file"
-                    mkdir -p "$(dirname "${toString cfg.configPath}")"
-                    cp ${configFile} ${toString cfg.configPath}
+                TimeoutStopSec = cfg.serverStopTimeout;
+                ExecStartPre = "+${pkgs.writers.writeBash "inventree-setup" ''
+                  echo "Creating config file"
+                  mkdir -p "$(dirname "${toString cfg.configPath}")"
+                  cp ${configFile} ${toString cfg.configPath}
 
-                    echo "Running database migrations"
-                    ${inventree.invoke}/bin/inventree-invoke migrate
+                  echo "Running database migrations"
+                  ${inventree.invoke}/bin/inventree-invoke migrate
 
-                    echo "Ensuring static files are populated"
-                    pushd ${inventree.src}/static
-                    find . -type f -exec install -Dm 644 "{}" "${cfg.config.static_root}/{}" \;
-                    popd
+                  echo "Ensuring static files are populated"
+                  pushd ${inventree.src}/static
+                  find . -type f -exec install -Dm 644 "{}" "${cfg.config.static_root}/{}" \;
+                  popd
 
-                    echo "Setting up users"
-                    cat ${usersFile} | \
-                      ${inventree.refresh-users}/bin/inventree-refresh-users
-                  ''}";
+                  echo "Setting up users"
+                  cat ${usersFile} | \
+                    ${inventree.refresh-users}/bin/inventree-refresh-users
+                ''}";
                 ExecStart = ''
                   ${inventree.server}/bin/inventree-server -b ${cfg.serverBind}
                 '';

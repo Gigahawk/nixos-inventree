@@ -1,4 +1,12 @@
-{stdenv, fetchFromGitHub, fetchzip, writeScript, yarn, pythonWithPackages, lib}:
+{
+  stdenv,
+  fetchFromGitHub,
+  fetchzip,
+  writeScript,
+  yarn,
+  pythonWithPackages,
+  lib,
+}:
 
 let
   # invoke command from nixpkgs is a prebuilt binary that appears to
@@ -33,7 +41,7 @@ stdenv.mkDerivation rec {
       name = "inventree-frontend";
       url = "https://github.com/inventree/InvenTree/releases/download/${version}/frontend-build.zip";
       hash = "sha256-ilJ1p2MFuYeVw/8oeasYsiZC57rUCuKKIUed0wBj6HE=";
-      stripRoot=false;
+      stripRoot = false;
     })
   ];
 

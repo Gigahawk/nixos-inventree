@@ -1,4 +1,15 @@
-{mkShell, pythonWithPackages, server, cluster, gen-secret, python, invoke, refresh-users, yarn, yarn2nix}:
+{
+  mkShell,
+  pythonWithPackages,
+  server,
+  cluster,
+  gen-secret,
+  python,
+  invoke,
+  refresh-users,
+  yarn,
+  yarn2nix,
+}:
 
 mkShell {
   inputsFrom = [

@@ -1,4 +1,9 @@
-{writeShellApplication, writeScript, pythonWithPackages, src}:
+{
+  writeShellApplication,
+  writeScript,
+  pythonWithPackages,
+  src,
+}:
 
 let
   refreshScript = writeScript "refresh_users.py" (builtins.readFile ./refresh_users.py);

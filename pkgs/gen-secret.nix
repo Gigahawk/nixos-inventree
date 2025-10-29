@@ -1,4 +1,9 @@
-{writeShellApplication, writeScript, pythonWithPackages, src}:
+{
+  writeShellApplication,
+  writeScript,
+  pythonWithPackages,
+  src,
+}:
 
 let
   genScript = writeScript "gen_secret_key.py" ''

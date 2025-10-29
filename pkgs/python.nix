@@ -1,4 +1,8 @@
-{writeShellApplication, pythonWithPackages, src}:
+{
+  writeShellApplication,
+  pythonWithPackages,
+  src,
+}:
 
 writeShellApplication rec {
   name = "inventree-python";
