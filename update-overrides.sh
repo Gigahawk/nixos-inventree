@@ -25,8 +25,6 @@ echo "Adding custom dependencies"
 # Waiting for 2.3.0 to fix https://github.com/pyinvoke/invoke/issues/1011
 uv add "invoke @ git+https://github.com/pyinvoke/invoke"
 
-#uv add crispy-bootstrap4
-
 # Related to plugins
 uv add pip
 

@@ -7,24 +7,6 @@
   pythonWithPackages,
   lib,
 }:
-
-let
-  # invoke command from nixpkgs is a prebuilt binary that appears to
-  # ignore the environment, create our own script to run invoke with
-  # our environment
-  invokeMain = writeScript "invokeMain" ''
-    from invoke import Program, __version__
-
-    program = Program(
-        name="Invoke",
-        binary="inv[oke]",
-        binary_names=["invoke", "inv"],
-        version=__version__,
-    )
-    program.run()
-  '';
-in
-
 stdenv.mkDerivation rec {
   pname = "inventree-src";
   version = "1.0.8";
@@ -43,11 +25,6 @@ stdenv.mkDerivation rec {
       hash = "sha256-O/iXloO/G6VHprmFuJ6riFBGe3W3HBgSVaEkGbri2qI=";
       stripRoot = false;
     })
-  ];
-
-  patches = [
-    #../patches/install-crispy-bootstrap4.patch
-    #../patches/configurable-static-i18-root.patch
   ];
 
   sourceRoot = ".";
