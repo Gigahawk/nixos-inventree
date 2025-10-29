@@ -6,5 +6,6 @@ A NixOS module to run Inventree as a native service
 
 1. Enter the devshell `nix develop .#uv`
 2. Update the submodule to point to the latest release
-3. Update the srcs targets in `pkgs/src`
-3. Run `update-overrides.sh`
+3. Update the srcs targets in `pkgs/src` (use dummy hashes to ensure new downloads happen)
+4. Run `update-overrides.sh`
+5. Run `nix build .#src` to get expected hashes

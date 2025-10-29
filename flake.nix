@@ -3,12 +3,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    # HACK: We want to use weasyprint from nixpkgs since the derivation includes
-    # all the CDLL call patches needed to actually make it run properly.
-    # Unfortunately the latest weasyprint version is too new for the current
-    # targeted InvenTree version and the build does not work if we just override
-    # version/src on the latest derivation, so pin a new nixpkgs instead
-    nixpkgs-weasyprint.url = "nixpkgs/ef76879e181edfeaf07dd4e4a8349cbba8d45563";
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
@@ -40,7 +34,6 @@
       pyproject-nix,
       uv2nix,
       pyproject-build-systems,
-      nixpkgs-weasyprint,
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
@@ -49,9 +42,6 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ self.overlays.default ];
-        };
-        pkgs-weasyprint = import nixpkgs-weasyprint {
-          inherit system;
         };
         inherit (nixpkgs) lib;
         python = pkgs.python312;
@@ -66,10 +56,17 @@
 
         pyprojectOverrides = final: prev: {
           weasyprint = hacks.nixpkgsPrebuilt {
-            from = pkgs-weasyprint.python312.pkgs.weasyprint;
+            from = pkgs.python312.pkgs.weasyprint;
           };
 
           django-allauth = prev.django-allauth.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
+
+          django-mailbox = prev.django-mailbox.overrideAttrs (old: {
             buildInputs = (old.buildInputs or [ ]) ++ [
               prev.setuptools
               prev.wheel
@@ -210,6 +207,8 @@
           configFile = pkgs.writeText "config.yaml" (builtins.toJSON cfg.config);
           usersFile = pkgs.writeText "users.json" (builtins.toJSON cfg.users);
           inventree = pkgs.inventree;
+          serverBind = "${cfg.bindIp}:${toString cfg.bindPort}";
+          allowedHostsStr = concatStringsSep "," cfg.allowedHosts;
 
           # Pre-compute SystemdDirectories to create the directories if they do not exists.
           singletonIfPrefix = prefix: str: optional (hasPrefix prefix str) (removePrefix prefix str);
@@ -265,13 +264,58 @@
             #  '';
             #};
 
-            serverBind = mkOption {
+            bindIp = mkOption {
               type = types.str;
-              default = "127.0.0.1:8000";
-              example = "0.0.0.0:1337";
+              default = "127.0.0.1";
+              example = "0.0.0.0";
               description = lib.mdDoc ''
-                The address and port the server will bind to.
+                The IP address the server will bind to.
                 (nginx should point to this address if running in production mode)
+              '';
+            };
+
+            bindPort = mkOption {
+              type = types.int;
+              default = 8000;
+              example = 1337;
+              description = lib.mdDoc ''
+                The port the server will bind to.
+                (nginx should point to this port if running in production mode)
+              '';
+            };
+
+            siteUrl = mkOption {
+              type = types.str;
+              default = "";
+              example = "https://inventree.example.com";
+              description = lib.mdDoc ''
+                The INVENTREE_SITE_URL option defines the base URL for the
+                InvenTree server. This is a critical setting, and it is required
+                for correct operation of the server. If not specified, the
+                server will attempt to determine the site URL automatically -
+                but this may not always be correct!
+
+                The site URL is the URL that users will use to access the
+                InvenTree server. For example, if the server is accessible at
+                `https://inventree.example.com`, the site URL should be set to
+                `https://inventree.example.com`. Note that this is not
+                necessarily the same as the internal URL that the server is
+                running on - the internal URL will depend entirely on your
+                server configuration and may be obscured by a reverse proxy or
+                other such setup.
+              '';
+            };
+
+            allowedHosts = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = ["*"];
+              description = lib.mdDoc ''
+                List of allowed hosts used to connect to the server.
+
+                If set, siteUrl is appended to this list at runtime.
+                If the list evaluates to empty at runtime, it defaults to allow
+                all (`["*"]`).
               '';
             };
 
@@ -403,6 +447,8 @@
               wantedBy = [ "multi-user.target" ];
               environment = {
                 INVENTREE_CONFIG_FILE = toString cfg.configPath;
+                INVENTREE_SITE_URL = cfg.siteUrl;
+                INVENTREE_ALLOWED_HOSTS = allowedHostsStr;
               };
               serviceConfig = systemdDirectories // {
                 User = defaultUser;
@@ -427,7 +473,7 @@
                     ${inventree.refresh-users}/bin/inventree-refresh-users
                 ''}";
                 ExecStart = ''
-                  ${inventree.server}/bin/inventree-server -b ${cfg.serverBind}
+                  ${inventree.server}/bin/inventree-server -b ${serverBind}
                 '';
               };
             };
@@ -436,6 +482,8 @@
               wantedBy = [ "multi-user.target" ];
               environment = {
                 INVENTREE_CONFIG_FILE = toString cfg.configPath;
+                INVENTREE_SITE_URL = cfg.siteUrl;
+                INVENTREE_ALLOWED_HOSTS = allowedHostsStr;
               };
               serviceConfig = systemdDirectories // {
                 User = defaultUser;
