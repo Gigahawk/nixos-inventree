@@ -56,8 +56,15 @@
 
         pyprojectOverrides = final: prev: {
           weasyprint = hacks.nixpkgsPrebuilt {
-            from = pkgs.python312.pkgs.weasyprint;
+            from = python.pkgs.weasyprint;
           };
+
+          # Seems packages aren't generally available unless they are explicitly
+          # specified in an overlay?
+          binaryornot = hacks.nixpkgsPrebuilt {
+            from = python.pkgs.binaryornot;
+          };
+          #binaryornot = prev.binaryornot;
 
           django-allauth = prev.django-allauth.overrideAttrs (old: {
             buildInputs = (old.buildInputs or [ ]) ++ [
@@ -130,7 +137,7 @@
       in
       {
         formatter = pkgs.nixfmt-tree;
-        packages = {
+        packages = rec {
           inherit (pkgs.inventree)
             src
             server
@@ -142,6 +149,7 @@
             shell
             ;
           venv = pythonSet.mkVirtualEnv "inventree-python" workspace.deps.default;
+          venv2 = pythonSet.mkVirtualEnv "inventree-python" (workspace.deps.default // {binaryornot = [];});
         };
         devShells = {
           default = pkgs.inventree.shell;
