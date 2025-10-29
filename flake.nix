@@ -3,12 +3,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    # HACK: We want to use weasyprint from nixpkgs since the derivation includes
-    # all the CDLL call patches needed to actually make it run properly.
-    # Unfortunately the latest weasyprint version is too new for the current
-    # targeted InvenTree version and the build does not work if we just override
-    # version/src on the latest derivation, so pin a new nixpkgs instead
-    nixpkgs-weasyprint.url = "nixpkgs/ef76879e181edfeaf07dd4e4a8349cbba8d45563";
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
@@ -40,7 +34,6 @@
       pyproject-nix,
       uv2nix,
       pyproject-build-systems,
-      nixpkgs-weasyprint,
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
@@ -49,9 +42,6 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ self.overlays.default ];
-        };
-        pkgs-weasyprint = import nixpkgs-weasyprint {
-          inherit system;
         };
         inherit (nixpkgs) lib;
         python = pkgs.python312;
@@ -66,10 +56,17 @@
 
         pyprojectOverrides = final: prev: {
           weasyprint = hacks.nixpkgsPrebuilt {
-            from = pkgs-weasyprint.python312.pkgs.weasyprint;
+            from = pkgs.python312.pkgs.weasyprint;
           };
 
           django-allauth = prev.django-allauth.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              prev.setuptools
+              prev.wheel
+            ];
+          });
+
+          django-mailbox = prev.django-mailbox.overrideAttrs (old: {
             buildInputs = (old.buildInputs or [ ]) ++ [
               prev.setuptools
               prev.wheel

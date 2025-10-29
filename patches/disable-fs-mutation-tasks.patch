@@ -1,47 +1,38 @@
 --- a/src/tasks.py
 +++ b/src/tasks.py
-@@ -290,6 +290,8 @@ def install(c, uv=False, skip_plugins=False):
-     INSTALL_FILE = localDir().joinpath('src/backend/requirements.txt')
- 
+@@ -491,6 +491,8 @@ def install(c, uv=False, skip_plugins=False):
+     INSTALL_FILE = local_dir().joinpath('src/backend/requirements.txt')
+
      info(f"Installing required python packages from '{INSTALL_FILE}'")
 +    warning("Skipping install on NixOS")
 +    return
- 
+
      if not Path(INSTALL_FILE).is_file():
          raise FileNotFoundError(f"Requirements file '{INSTALL_FILE}' not found")
-@@ -395,6 +397,8 @@ def remove_mfa(c, mail=''):
- )
+@@ -608,6 +610,8 @@ def remove_mfa(c, mail=''):
+ @state_logger('TASK08')
  def static(c, frontend=False, clear=True, skip_plugins=False):
      """Copies required static files to the STATIC_ROOT directory, as per Django requirements."""
 +    warning("Skipping static file generation on NixOS")
 +    return
-     manage(c, 'prerender')
- 
      if frontend and node_available():
-@@ -423,6 +427,8 @@ def translate_stats(c):
- 
-     The file generated from this is needed for the UI.
-     """
-+    warning("Skipping translation stats on NixOS")
-+    return
-     # Recompile the translation files (.mo)
-     # We do not run 'invoke dev.translate' here, as that will touch the source (.po) files too!
-     try:
-@@ -1217,6 +1223,8 @@ def frontend_compile(c):
-         c: Context variable
+         frontend_compile(c)
+
+@@ -1541,6 +1545,8 @@ def frontend_compile(c, extract: bool = False):
+         extract (bool): Whether to extract translations from source code. Defaults to False.
      """
      info('Compiling frontend code...')
 +    warning("Skipping frontend compile on NixOS")
 +    return
      frontend_install(c)
-     frontend_trans(c)
+     frontend_trans(c, extract=extract)
      frontend_build(c)
-@@ -1309,6 +1317,8 @@ def frontend_download(
+@@ -1651,6 +1657,8 @@ def frontend_download(
      import requests
- 
+
      info('Downloading frontend...')
 +    warning("Skipping frontend download on NixOS")
 +    return
- 
+
      # globals
      default_headers = {'Accept': 'application/vnd.github.v3+json'}

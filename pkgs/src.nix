@@ -27,7 +27,7 @@ in
 
 stdenv.mkDerivation rec {
   pname = "inventree-src";
-  version = "0.17.14";
+  version = "1.0.8";
 
   srcs = [
     (fetchFromGitHub {
@@ -35,19 +35,19 @@ stdenv.mkDerivation rec {
       owner = "inventree";
       repo = "InvenTree";
       rev = version;
-      hash = "sha256-clUV5GEBXe3ZUkwvUuhuXJ0bXY9xvfszlFWv5An6CWE=";
+      hash = "sha256-qc+trg4A88iqatB2/80ASfgA14fnBawucxIqAdv4O0Q=";
     })
     (fetchzip {
       name = "inventree-frontend";
       url = "https://github.com/inventree/InvenTree/releases/download/${version}/frontend-build.zip";
-      hash = "sha256-ilJ1p2MFuYeVw/8oeasYsiZC57rUCuKKIUed0wBj6HE=";
+      hash = "sha256-O/iXloO/G6VHprmFuJ6riFBGe3W3HBgSVaEkGbri2qI=";
       stripRoot = false;
     })
   ];
 
   patches = [
-    ../patches/install-crispy-bootstrap4.patch
-    ../patches/configurable-static-i18-root.patch
+    #../patches/install-crispy-bootstrap4.patch
+    #../patches/configurable-static-i18-root.patch
   ];
 
   sourceRoot = ".";
@@ -73,9 +73,6 @@ stdenv.mkDerivation rec {
     popd
 
 
-    #cp -r inventree-src/* src/.
-    #cp -r inventree-frontend/* src/.
-
     echo "Patching deprecated django calls"
     # Patch is_ajax method as it has been deprecated in django.
     # https://docs.djangoproject.com/en/3.1/releases/3.1/#id2
@@ -83,13 +80,14 @@ stdenv.mkDerivation rec {
 
     echo "Building static files"
     export INVENTREE_SRC=$(pwd)/src
+    export INVENTREE_SITE_URL="http://build.dummy.inventree.com"
     export INVENTREE_STATIC_ROOT=$(pwd)/static
     export INVENTREE_MEDIA_ROOT=$(pwd)/media
     export INVENTREE_BACKUP_DIR=$(pwd)/backup
     export INVENTREE_DB_ENGINE=sqlite3
     export INVENTREE_DB_NAME=$(pwd)/db/db.sqlite3
     pushd $INVENTREE_SRC
-    python ${invokeMain} static
+    invoke static
     popd
 
     echo "Disabling fs mutation tasks"
