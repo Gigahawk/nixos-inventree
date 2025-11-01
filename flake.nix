@@ -188,8 +188,7 @@
             gen-secret
             shell
             ;
-          venv = (venvWithPlugins { });
-          venv2 = (venvWithPlugins {inventree-kicad-plugin = [];});
+          venv = (venvWithPlugins {inventree-kicad-plugin = [];});
         };
         devShells = {
           default = pkgs.inventree.shell;
