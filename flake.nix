@@ -154,12 +154,10 @@
             python
             refresh-users
             gen-secret
-            shell
             ;
           venv = (venvWithPlugins { inventree-kicad-plugin = [ ]; });
         };
-        devShells = {
-          default = pkgs.inventree.shell;
+        devShells = rec {
           uv = pkgs.mkShell {
             packages = [
               pkgs.uv
@@ -183,6 +181,7 @@
               export REPO_ROOT=$(git rev-parse --show-toplevel)
             '';
           };
+          default = uv;
         };
       }
     )
@@ -199,9 +198,6 @@
             python = _self.callPackage ./pkgs/python.nix { };
             refresh-users = _self.callPackage ./pkgs/refresh-users.nix { };
             gen-secret = _self.callPackage ./pkgs/gen-secret.nix { };
-
-            # Requires pip2nix overlay, which is managed by the flake.
-            shell = _self.callPackage ./pkgs/shell.nix { };
           });
         }
       );
