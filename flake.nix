@@ -209,7 +209,6 @@
             inherit (cfg) users systemSettings;
           });
           inventree = pkgs.inventree;
-          serverBind = "${cfg.bindIp}:${toString cfg.bindPort}";
           allowedHostsStr = concatStringsSep "," cfg.allowedHosts;
 
           # Pre-compute SystemdDirectories to create the directories if they do not exists.
@@ -265,6 +264,15 @@
             #    By default, a group named `${defaultGroup}` will be created.
             #  '';
             #};
+
+            serverBind = mkOption {
+              type = types.str;
+              default = "${cfg.bindIp}:${toString cfg.bindPort}";
+              example = "unix:/run/inventree/inventree.sock";
+              description = ''
+                The address and port the server will bind to.
+              '';
+            };
 
             bindIp = mkOption {
               type = types.str;
@@ -486,7 +494,7 @@
                     ${inventree.refresh-db-config}/bin/inventree-refresh-db-config
                 ''}";
                 ExecStart = ''
-                  ${inventree.server}/bin/inventree-server -b ${serverBind}
+                  ${inventree.server}/bin/inventree-server -b ${cfg.serverBind}
                 '';
               };
             };
