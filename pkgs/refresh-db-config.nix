@@ -6,11 +6,11 @@
 }:
 
 let
-  refreshScript = writeScript "refresh_users.py" (builtins.readFile ./refresh_users.py);
+  refreshScript = writeScript "refresh_db_config.py" (builtins.readFile ./refresh_db_config.py);
 in
 
 writeShellApplication rec {
-  name = "inventree-refresh-users";
+  name = "inventree-refresh-db-config";
   runtimeInputs = [
     pythonWithPackages
     src

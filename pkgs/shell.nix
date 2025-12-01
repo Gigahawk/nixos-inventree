@@ -6,7 +6,7 @@
   gen-secret,
   python,
   invoke,
-  refresh-users,
+  refresh-db-config,
   yarn,
   yarn2nix,
 }:
@@ -24,6 +24,6 @@ mkShell {
     gen-secret
     python
     invoke
-    refresh-users
+    refresh-db-config
   ];
 }
