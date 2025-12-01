@@ -226,10 +226,10 @@
           settingsFormat = pkgs.formats.json { };
           defaultUser = "inventree";
           defaultGroup = defaultUser;
-          configFile = pkgs.writeText "config.yaml" (builtins.toJSON cfg.config);
+          configFormat = pkgs.formats.yaml {};
+          configFile = configFormat.generate "config.yaml"  cfg.config;
           usersFile = pkgs.writeText "users.json" (builtins.toJSON cfg.users);
           inventree = pkgs.inventree;
-          allowedHostsStr = concatStringsSep "," cfg.allowedHosts;
 
           # Pre-compute SystemdDirectories to create the directories if they do not exists.
           singletonIfPrefix = prefix: str: optional (hasPrefix prefix str) (removePrefix prefix str);
@@ -314,41 +314,6 @@
               '';
             };
 
-            siteUrl = mkOption {
-              type = types.str;
-              default = "";
-              example = "https://inventree.example.com";
-              description = lib.mdDoc ''
-                The INVENTREE_SITE_URL option defines the base URL for the
-                InvenTree server. This is a critical setting, and it is required
-                for correct operation of the server. If not specified, the
-                server will attempt to determine the site URL automatically -
-                but this may not always be correct!
-
-                The site URL is the URL that users will use to access the
-                InvenTree server. For example, if the server is accessible at
-                `https://inventree.example.com`, the site URL should be set to
-                `https://inventree.example.com`. Note that this is not
-                necessarily the same as the internal URL that the server is
-                running on - the internal URL will depend entirely on your
-                server configuration and may be obscured by a reverse proxy or
-                other such setup.
-              '';
-            };
-
-            allowedHosts = mkOption {
-              type = types.listOf types.str;
-              default = [ ];
-              example = [ "*" ];
-              description = lib.mdDoc ''
-                List of allowed hosts used to connect to the server.
-
-                If set, siteUrl is appended to this list at runtime.
-                If the list evaluates to empty at runtime, it defaults to allow
-                all (`["*"]`).
-              '';
-            };
-
             dataDir = mkOption {
               type = types.str;
               default = "/var/lib/inventree";
@@ -388,7 +353,44 @@
             };
 
             config = mkOption {
-              type = types.attrs;
+              type = types.submodule {
+                freeformType = configFormat.type;
+                options = {
+                  site_url = mkOption {
+                    type = types.str;
+                    default = "";
+                    example = "https://inventree.example.com";
+                    description = lib.mdDoc ''
+                      The INVENTREE_SITE_URL option defines the base URL for the
+                      InvenTree server. This is a critical setting, and it is required
+                      for correct operation of the server. If not specified, the
+                      server will attempt to determine the site URL automatically -
+                      but this may not always be correct!
+
+                      The site URL is the URL that users will use to access the
+                      InvenTree server. For example, if the server is accessible at
+                      `https://inventree.example.com`, the site URL should be set to
+                      `https://inventree.example.com`. Note that this is not
+                      necessarily the same as the internal URL that the server is
+                      running on - the internal URL will depend entirely on your
+                      server configuration and may be obscured by a reverse proxy or
+                      other such setup.
+                    '';
+                  };
+                  allowed_hosts = mkOption {
+                    type = types.listOf types.str;
+                    default = [ ];
+                    example = [ "*" ];
+                    description = lib.mdDoc ''
+                      List of allowed hosts used to connect to the server.
+
+                      If set, site_url is appended to this list at runtime.
+                      If the list evaluates to empty at runtime, it defaults to allow
+                      all (`["*"]`).
+                    '';
+                  };
+                };
+              };
               default = { };
               description = lib.mdDoc ''
                 Config options, see https://docs.inventree.org/en/stable/start/config/
@@ -443,6 +445,17 @@
             };
           };
 
+          imports = [
+            (lib.mkRenamedOptionModule
+              [ "services" "inventree" "siteUrl" ]
+              [ "services" "inventree" "config" "site_url" ]
+            )
+            (lib.mkRenamedOptionModule
+              [ "services" "inventree" "allowedHosts" ]
+              [ "services" "inventree" "config" "allowed_hosts" ]
+            )
+          ];
+
           config = mkIf cfg.enable {
             nixpkgs.overlays = [ self.overlays.default ];
 
@@ -477,8 +490,6 @@
               wantedBy = [ "multi-user.target" ];
               environment = {
                 INVENTREE_CONFIG_FILE = toString cfg.configPath;
-                INVENTREE_SITE_URL = cfg.siteUrl;
-                INVENTREE_ALLOWED_HOSTS = allowedHostsStr;
               };
               serviceConfig = systemdDirectories // {
                 User = defaultUser;
@@ -512,8 +523,6 @@
               wantedBy = [ "multi-user.target" ];
               environment = {
                 INVENTREE_CONFIG_FILE = toString cfg.configPath;
-                INVENTREE_SITE_URL = cfg.siteUrl;
-                INVENTREE_ALLOWED_HOSTS = allowedHostsStr;
               };
               serviceConfig = systemdDirectories // {
                 User = defaultUser;
