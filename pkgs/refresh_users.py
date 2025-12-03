@@ -1,12 +1,13 @@
 import json
 import os
 import sys
+import time
 # This is required to pickup InvenTree.settings for some reason
 sys.path.append(os.getcwd())
 
 import django
 from django.db import transaction
-from django.db.utils import IntegrityError
+from django.db.utils import IntegrityError, OperationalError
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'InvenTree.settings')
 django.setup()
@@ -36,33 +37,47 @@ def _get_user_data():
 
 
 def _commit_users(data):
+    max_attempts = 10
     user_model = get_user_model()
-    try:
-        with transaction.atomic():
-            print("Deleting all users")
-            all_users = user_model.objects.all()
-            print(all_users)
-            all_users.delete()
+    # This seems to fail a bunch, retry until it succeeds
+    for idx in range(max_attempts):
+        try:
+            with transaction.atomic():
+                print(f"Deleting all users attempt {idx}")
+                all_users = user_model.objects.all()
+                print(all_users)
+                all_users.delete()
 
-            for username, fields in data.items():
-                password = fields["password"]
-                email = fields["email"]
-                is_superuser = fields.get("is_superuser", False)
-                # can we use kwargs to do this?
-                if is_superuser:
-                    print(f"Creating superuser {username}")
-                    new_user = user_model.objects.create_superuser(
-                        username, email, password
-                    )
-                    print(f"User {new_user} was created!")
-                else:
-                    print(f"Creating regular user {username}")
-                    new_user = user_model.objects.create_user(
-                        username, email, password
-                    )
-                    print(f"User {new_user} was created!")
-    except IntegrityError:
-        print("integrity error")
+                for username, fields in data.items():
+                    password = fields["password"]
+                    email = fields["email"]
+                    is_superuser = fields.get("is_superuser", False)
+                    # can we use kwargs to do this?
+                    if is_superuser:
+                        print(f"Creating superuser {username}")
+                        new_user = user_model.objects.create_superuser(
+                            username, email, password
+                        )
+                        print(f"User {new_user} was created!")
+                    else:
+                        print(f"Creating regular user {username}")
+                        new_user = user_model.objects.create_user(
+                            username, email, password
+                        )
+                        print(f"User {new_user} was created!")
+                
+                break
+        except IntegrityError:
+            print("integrity error")
+        except OperationalError as e:
+            print("OperationalError, database is probably locked")
+            print(e)
+            if idx < max_attempts - 1:
+                print("Sleeping for 10s before retrying")
+                time.sleep(10)
+    else:
+        # TODO: better error?
+        raise RuntimeError("Failed to delete users")
 
 
 def main():
