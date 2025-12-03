@@ -1,12 +1,13 @@
 import json
 import os
 import sys
+from time import sleep
 # This is required to pickup InvenTree.settings for some reason
 sys.path.append(os.getcwd())
 
 import django
 from django.db import transaction
-from django.db.utils import IntegrityError
+from django.db.utils import IntegrityError, OperationalError
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'InvenTree.settings')
 django.setup()
@@ -36,13 +37,27 @@ def _get_user_data():
 
 
 def _commit_users(data):
+    max_attempts = 10
     user_model = get_user_model()
     try:
         with transaction.atomic():
-            print("Deleting all users")
-            all_users = user_model.objects.all()
-            print(all_users)
-            all_users.delete()
+            for idx in range(max_attempts):
+                print(f"Deleting all users attempt {idx}")
+                all_users = user_model.objects.all()
+                print(all_users)
+                # This seems to fail a bunch, retry until it succeeds
+                try:
+                    all_users.delete()
+                    break
+                except OperationalError as e:
+                    print("OperationalError, database is probably locked")
+                    print(e)
+                    if idx < max_attempts - 1:
+                        print("Sleeping for 10s before retrying")
+                        sleep(10)
+            else:
+                # TODO: better error?
+                raise RuntimeError("Failed to delete users")
 
             for username, fields in data.items():
                 password = fields["password"]
