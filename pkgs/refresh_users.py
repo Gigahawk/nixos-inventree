@@ -12,7 +12,7 @@ from django.db.utils import IntegrityError, OperationalError
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'InvenTree.settings')
 django.setup()
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model  # noqa: E402
 
 def _get_user_data():
     if os.isatty(0):

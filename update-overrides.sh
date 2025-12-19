@@ -3,16 +3,16 @@
 set -Eeuo pipefail
 
 clean_misc() {
-    echo "Cleaning generated uv files"
-    rm -f main.py
-    rm -f .python-version
+  echo "Cleaning generated uv files"
+  rm -f main.py
+  rm -f .python-version
 
 }
 clean_all() {
-    echo "Cleaning old uv files"
-    clean_misc
-    rm -f pyproject.toml
-    rm -f uv.lock
+  echo "Cleaning old uv files"
+  clean_misc
+  rm -f pyproject.toml
+  rm -f uv.lock
 }
 
 clean_all
@@ -30,6 +30,6 @@ uv add pip
 
 # https://stackoverflow.com/a/72547402
 echo "Adding setuptools workaround to pyproject"
-echo -e "[tool.setuptools]\npy-modules = []" >> pyproject.toml
+echo -e "[tool.setuptools]\npy-modules = []" >>pyproject.toml
 
 clean_misc
