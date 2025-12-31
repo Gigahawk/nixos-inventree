@@ -200,7 +200,7 @@
       overlays.default = (
         final: prev: {
           inventree = final.lib.makeScope final.newScope (_self: {
-            pythonWithPackages = self.packages.${prev.system}.venv;
+            pythonWithPackages = self.packages.${prev.pkgs.stdenv.hostPlatform.system}.venv;
 
             src = _self.callPackage ./pkgs/src.nix { };
             server = _self.callPackage ./pkgs/server.nix { };
