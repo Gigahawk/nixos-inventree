@@ -37,6 +37,9 @@ def _get_user_data():
 
 
 def _commit_users(data):
+    if not data:
+        print("No users to configure")
+        return
     max_attempts = 10
     user_model = get_user_model()
     # This seems to fail a bunch, retry until it succeeds
