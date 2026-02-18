@@ -2,7 +2,15 @@
 
 A NixOS module to run Inventree as a native service
 
-## Updating
+> [!IMPORTANT]
+> If you are updating your instance from a version prior to 1.2.x you MUST FIRST:
+> 1. (optional) Update to 1.1.12 and ensure all migrations run correctly (lock your flake input to https://github.com/Gigahawk/nixos-inventree/commit/cf3d49c3505df8537e7f0ecba3ad23df48d4afd1)
+> 2. Update ONLY Inventree to 1.2.0 and ensure all migrations run correctly (lock your flake input to https://github.com/Gigahawk/nixos-inventree/commit/b74464f366c1d8f7d3c2b8f0fb04840eb8d9e27f)
+>    
+> Only then is it safe to update to the latest commit.
+> Due to https://github.com/afkiwers/inventree_kicad/issues/159 it is not currently possible to simultaneously update both the Inventree and inventree-kicad-plugin versions without running into issues during migration
+
+## Updating this Repo
 
 1. Enter the devshell `nix develop .#uv`
 2. Update the submodule to point to the latest release
