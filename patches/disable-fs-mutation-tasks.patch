@@ -1,15 +1,42 @@
 --- a/src/tasks.py
 +++ b/src/tasks.py
-@@ -491,6 +491,8 @@ def install(c, uv=False, skip_plugins=False):
-     INSTALL_FILE = local_dir().joinpath('src/backend/requirements.txt')
-
-     info(f"Installing required python packages from '{INSTALL_FILE}'")
-+    warning("Skipping install on NixOS")
+@@ -426,6 +426,8 @@ def run_install(
+     pinned=True,
+ ):
+     """Run the installation of python packages from a requirements file."""
++    warning("Skipping python package install on NixOS")
 +    return
-
-     if not Path(INSTALL_FILE).is_file():
-         raise FileNotFoundError(f"Requirements file '{INSTALL_FILE}' not found")
-@@ -608,6 +610,8 @@ def remove_mfa(c, mail=''):
+     if version_check:
+         # Test if there is a version specific requirements file
+         sys_ver_s = python_version().split('.')
+@@ -536,6 +538,8 @@ def check_file_existence(filename: Path, overwrite: bool = False):
+ @state_logger('TASK01')
+ def plugins(c, uv=False):
+     """Installs all plugins as specified in 'plugins.txt'."""
++    warning("Skipping plugin install on NixOS")
++    return
+     from src.backend.InvenTree.InvenTree.config import (  # type: ignore[import]
+         get_plugin_file,
+     )
+@@ -556,6 +560,8 @@ def plugins(c, uv=False):
+ @state_logger('TASK02')
+ def install(c, uv=False, skip_plugins=False, dev=False):
+     """Installs required python packages."""
++    warning("Skipping dependencies install on NixOS")
++    return
+     if dev:
+         run_install(
+             c,
+@@ -588,6 +594,8 @@ def install(c, uv=False, skip_plugins=False, dev=False):
+ @task(help={'tests': 'Set up test dataset at the end'})
+ def setup_dev(c, tests=False):
+     """Sets up everything needed for the dev environment."""
++    warning("Skipping dev env setup on NixOS")
++    return
+     # Install required Python packages with PIP
+     install(c, uv=False, skip_plugins=True, dev=True)
+ 
+@@ -672,6 +680,8 @@ def remove_mfa(c, mail='', username=''):
  @state_logger('TASK08')
  def static(c, frontend=False, clear=True, skip_plugins=False):
      """Copies required static files to the STATIC_ROOT directory, as per Django requirements."""
@@ -17,22 +44,67 @@
 +    return
      if frontend and node_available():
          frontend_compile(c)
-
-@@ -1541,6 +1545,8 @@ def frontend_compile(c, extract: bool = False):
+ 
+@@ -698,6 +708,8 @@ def translate(c, ignore_static=False, no_frontend=False):
+     Note: This command should not be used on a local install,
+     it is performed as part of the InvenTree translation toolchain.
+     """
++    warning("Skipping translation generation on NixOS")
++    return
+     info('Building translation files')
+ 
+     # Translate applicable .py / .html / .js files
+@@ -1676,6 +1688,8 @@ def frontend_compile(c, extract: bool = False):
+         c: Context variable
          extract (bool): Whether to extract translations from source code. Defaults to False.
      """
-     info('Compiling frontend code...')
 +    warning("Skipping frontend compile on NixOS")
 +    return
+     info('Compiling frontend code...')
      frontend_install(c)
      frontend_trans(c, extract=extract)
-     frontend_build(c)
-@@ -1651,6 +1657,8 @@ def frontend_download(
+@@ -1690,6 +1704,8 @@ def frontend_install(c):
+     Args:
+         c: Context variable
+     """
++    warning("Skipping frontend install on NixOS")
++    return
+     info('Installing frontend dependencies')
+     yarn(c, 'yarn install')
+ 
+@@ -1702,6 +1718,8 @@ def frontend_trans(c, extract: bool = True):
+         c: Context variable
+         extract (bool): Whether to extract translations from source code. Defaults to True.
+     """
++    warning("Skipping frontend translation compilation on NixOS")
++    return
+     info('Compiling frontend translations')
+     if extract:
+         yarn(c, 'yarn run extract')
+@@ -1715,6 +1733,8 @@ def frontend_build(c):
+     Args:
+         c: Context variable
+     """
++    warning("Skipping frontend build on NixOS")
++    return
+     info('Building frontend')
+     yarn(c, 'yarn run build')
+ 
+@@ -1812,6 +1832,8 @@ def frontend_download(
      import requests
-
+ 
      info('Downloading frontend...')
 +    warning("Skipping frontend download on NixOS")
 +    return
-
+ 
      # globals
      default_headers = {'Accept': 'application/vnd.github.v3+json'}
+@@ -2013,6 +2035,8 @@ def docs_server(c, address='localhost:8080', compile_schema=False):
+ )
+ def build_docs(c, mkdocs=False):
+     """Build the required documents for building the docs. Optionally build the documentation using mkdocs."""
++    warning("Skipping docs build on NixOS")
++    return
+     migrate(c)
+     export_definitions(c, basedir='docs')
+     doc_schema(c)
