@@ -226,8 +226,8 @@
           settingsFormat = pkgs.formats.json { };
           defaultUser = "inventree";
           defaultGroup = defaultUser;
-          configFormat = pkgs.formats.yaml {};
-          configFile = configFormat.generate "config.yaml"  cfg.config;
+          configFormat = pkgs.formats.yaml { };
+          configFile = configFormat.generate "config.yaml" cfg.config;
           usersFile = pkgs.writeText "users.json" (builtins.toJSON cfg.users);
           inventree = pkgs.inventree;
 
