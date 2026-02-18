@@ -1,17 +1,19 @@
 {
   stdenv,
-  fetchurl,
+  fetchFromGitHub,
   pyprojectHook,
   resolveBuildSystem,
   prev,
 }:
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "inventree-kicad-plugin";
-  version = "1.5.1";
+  version = "2.0.3";
   src = (
-    fetchurl {
-      url = "https://files.pythonhosted.org/packages/be/46/f12460bcd77e477b814909201f7fed90856516f37917fb48b50c518013eb/inventree_kicad_plugin-1.5.1.tar.gz";
-      hash = "sha256-BhoaGfg9jdx2ym8Vxg5jqR7rDmLPh2ek0uMX/CPyPc0=";
+    fetchFromGitHub {
+      owner = "afkiwers";
+      repo = "inventree_kicad";
+      rev = version;
+      hash = "sha256-4ijzkswzuD6JnQ9VadFXvdixKlJ6lhaZ7Ov2YoAjSus=";
     }
   );
   nativeBuildInputs = [
