@@ -1,8 +1,9 @@
 {
   writeShellApplication,
   writeScript,
-  pythonWithPackages,
+  venv,
   src,
+  ...
 }:
 
 let
@@ -17,7 +18,7 @@ in
 writeShellApplication rec {
   name = "inventree-gen-secret";
   runtimeInputs = [
-    pythonWithPackages
+    venv
     src
   ];
 

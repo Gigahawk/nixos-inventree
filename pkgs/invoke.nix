@@ -3,15 +3,16 @@
   writeScript,
   yarn,
   bash,
-  pythonWithPackages,
+  venv,
   src,
+  ...
 }:
 
 writeShellApplication rec {
   name = "inventree-invoke";
   runtimeInputs = [
     yarn
-    pythonWithPackages
+    venv
     src
     bash
   ];

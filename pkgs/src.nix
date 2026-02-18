@@ -4,8 +4,9 @@
   fetchzip,
   writeScript,
   yarn,
-  pythonWithPackages,
+  venv,
   lib,
+  ...
 }:
 stdenv.mkDerivation rec {
   pname = "inventree-src";
@@ -31,7 +32,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     yarn
-    pythonWithPackages
+    venv
   ];
 
   buildPhase = ''
