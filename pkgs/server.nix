@@ -1,13 +1,14 @@
 {
   writeShellApplication,
-  pythonWithPackages,
+  venv,
   src,
+  ...
 }:
 
 writeShellApplication rec {
   name = "inventree-server";
   runtimeInputs = [
-    pythonWithPackages
+    venv
     src
   ];
 

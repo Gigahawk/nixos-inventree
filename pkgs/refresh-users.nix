@@ -1,8 +1,9 @@
 {
   writeShellApplication,
   writeScript,
-  pythonWithPackages,
+  venv,
   src,
+  ...
 }:
 
 let
@@ -12,7 +13,7 @@ in
 writeShellApplication rec {
   name = "inventree-refresh-users";
   runtimeInputs = [
-    pythonWithPackages
+    venv
     src
   ];
 
