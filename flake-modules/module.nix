@@ -1,7 +1,8 @@
-{ self, inputs, ... }:
+{ moduleWithSystem, inputs, ... }:
 {
-  flake = rec {
-    nixosModules.default =
+  flake = {
+    nixosModules.default = moduleWithSystem (
+      perSystem@{ pkgs, ... }:
       {
         lib,
         pkgs,
@@ -46,20 +47,29 @@
           ConfigurationDirectory = maybeSystemdDir "/etc/";
         };
 
-        venv = self.packages.${pkgs.stdenv.hostPlatform.system}.venv.override {
-          plugins = cfg.plugins;
-        };
-        src = self.packages.${pkgs.stdenv.hostPlatform.system}.src.override { inherit venv; };
-        server = self.packages.${pkgs.stdenv.hostPlatform.system}.server.override { inherit venv; };
-        cluster = self.packages.${pkgs.stdenv.hostPlatform.system}.cluster.override { inherit venv; };
-        invoke = self.packages.${pkgs.stdenv.hostPlatform.system}.invoke.override { inherit venv; };
-        refresh-users = self.packages.${pkgs.stdenv.hostPlatform.system}.refresh-users.override {
-          inherit venv;
-        };
+        inherit (cfg.packages)
+          src
+          server
+          cluster
+          invoke
+          refresh-users
+          ;
       in
       {
         options.services.inventree = {
           enable = mkEnableOption (lib.mdDoc "Open Source Inventory Management System");
+
+          packages = mkOption {
+            default = perSystem.pkgs.inventree;
+            description = ''
+              This option allows you to override the package scope used for InvenTree.
+            '';
+            apply =
+              p:
+              p.overrideScope (_: _: {
+                inherit (cfg) plugins;
+              });
+          };
 
           #user = mkOption {
           #  type = types.str;
@@ -340,7 +350,7 @@
             };
           };
         };
-      };
+      }
+    );
   };
-
 }

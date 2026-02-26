@@ -1,41 +1,33 @@
 { inputs, ... }:
 {
+  inventree.packages = _self: {
+    src = _self.callPackage ../pkgs/src.nix { };
+
+    server = _self.callPackage ../pkgs/server.nix { };
+    cluster = _self.callPackage ../pkgs/cluster.nix { };
+    invoke = _self.callPackage ../pkgs/invoke.nix { };
+    refresh-users = _self.callPackage ../pkgs/refresh-users.nix { };
+    gen-secret = _self.callPackage ../pkgs/gen-secret.nix { };
+
+    inventree-python = _self.callPackage ../pkgs/python.nix { };
+  };
+
   perSystem =
     {
-      self',
       pkgs,
-      lib,
       ...
     }:
-    let
-      venv = self'.packages.venv;
-
-      mkOverride =
-        scope: path:
-        let
-          pkgFun = import path;
-        in
-        lib.makeOverridable (args: pkgs.callPackage pkgFun (scope // { inherit venv; } // args)) { };
-
-      packages = lib.fix (
-        self:
-        let
-          call = mkOverride self;
-        in
-        {
-          src = call ../pkgs/src.nix;
-
-          server = call ../pkgs/server.nix;
-          cluster = call ../pkgs/cluster.nix;
-          invoke = call ../pkgs/invoke.nix;
-          refresh-users = call ../pkgs/refresh-users.nix;
-          gen-secret = call ../pkgs/gen-secret.nix;
-
-          inventree-python = call ../pkgs/python.nix;
-        }
-      );
-    in
     {
-      inherit packages;
+      packages = {
+        inherit (pkgs.inventree)
+          src
+          server
+          cluster
+          invoke
+          refresh-users
+          gen-secret
+          inventree-python
+          ;
+      };
     };
 }
