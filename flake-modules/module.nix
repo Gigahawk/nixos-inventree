@@ -233,8 +233,17 @@
                       '';
                     };
 
+                    password = mkOption {
+                      type = nullOr types.str;
+                      description = lib.mdDoc ''
+                        The password for the user.
+                        WARNING: password will be stored in plaintext in nix store.
+                        Use this only for test deployments.
+                      '';
+                    };
+
                     password_file = mkOption {
-                      type = types.path;
+                      type = nullOr types.path;
                       description = lib.mdDoc ''
                         The path to the password file for the user
                       '';
