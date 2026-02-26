@@ -1,14 +1,12 @@
-{ hacks, python }:
-
 final: prev: {
-  weasyprint = hacks.nixpkgsPrebuilt {
-    from = python.pkgs.weasyprint;
+  weasyprint = final.hacks.nixpkgsPrebuilt {
+    from = final.python.pkgs.weasyprint;
   };
 
   # Seems packages aren't generally available unless they are explicitly
   # specified in an overlay?
-  binaryornot = hacks.nixpkgsPrebuilt {
-    from = python.pkgs.binaryornot;
+  binaryornot = final.hacks.nixpkgsPrebuilt {
+    from = final.python.pkgs.binaryornot;
   };
   #binaryornot = prev.binaryornot;
 
