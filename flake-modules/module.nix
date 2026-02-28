@@ -66,9 +66,11 @@
             '';
             apply =
               p:
-              p.overrideScope (_: _: {
-                inherit (cfg) plugins;
-              });
+              p.overrideScope (
+                _: _: {
+                  inherit (cfg) plugins;
+                }
+              );
           };
 
           #user = mkOption {
