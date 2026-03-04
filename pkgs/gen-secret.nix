@@ -30,10 +30,6 @@ writeShellApplication rec {
     export INVENTREE_SECRET_KEY_FILE
     unset INVENTREE_SECRET_KEY
 
-    # This is needed now for some reason
-    DJANGO_SETTINGS_MODULE="InvenTree.settings"
-    export DJANGO_SETTINGS_MODULE
-
     pushd $INVENTREE_SRC/InvenTree > /dev/null 2>&1
     echo "Removing any existing secret $INVENTREE_SECRET_KEY_FILE"
     rm -rf "$INVENTREE_SECRET_KEY_FILE"
