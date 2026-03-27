@@ -8,6 +8,13 @@
     }:
     {
       devShells = rec {
+        default = pkgs.mkShell {
+          packages = [
+            self'.packages.server
+            self'.packages.invoke
+            self'.packages.cluster
+          ];
+        };
         uv = pkgs.mkShell {
           packages = [
             pkgs.uv
@@ -31,7 +38,6 @@
             export REPO_ROOT=$(git rev-parse --show-toplevel)
           '';
         };
-        default = uv;
       };
     };
 

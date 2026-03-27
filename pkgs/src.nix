@@ -72,6 +72,10 @@ stdenv.mkDerivation rec {
     # Patch out invoke tasks that will attempt to mutate the nix store
     # after we generate the files
     patch -p1 < ${../patches/disable-fs-mutation-tasks.patch}
+
+    echo "Enabling support for plugin installation to external dir"
+    patch -p1 < ${../patches/install-ext.patch}
+    patch -p1 < ${../patches/registry-ext.patch}
   '';
 
   installPhase = ''
