@@ -1,43 +1,43 @@
 --- a/src/tasks.py
 +++ b/src/tasks.py
-@@ -426,6 +426,8 @@ def run_install(
-     pinned=True,
- ):
-     """Run the installation of python packages from a requirements file."""
+@@ -531,6 +531,8 @@ def run_install(
+         pinned: Whether to use the --require-hashes option when installing packages. Default is True.
+         verbose: Whether to print verbose output from pip install commands. Default is False.
+     """
 +    warning("Skipping python package install on NixOS")
 +    return
      if version_check:
          # Test if there is a version specific requirements file
          sys_ver_s = python_version().split('.')
-@@ -536,6 +538,8 @@ def check_file_existence(filename: Path, overwrite: bool = False):
- @state_logger('TASK01')
- def plugins(c, uv=False):
+@@ -656,6 +658,8 @@ def wait(c, verbose: bool = False):
+ @state_logger
+ def plugins(c, uv: bool = False, verbose: bool = False):
      """Installs all plugins as specified in 'plugins.txt'."""
 +    warning("Skipping plugin install on NixOS")
 +    return
      from src.backend.InvenTree.InvenTree.config import (  # type: ignore[import]
          get_plugin_file,
      )
-@@ -556,6 +560,8 @@ def plugins(c, uv=False):
- @state_logger('TASK02')
- def install(c, uv=False, skip_plugins=False, dev=False):
-     """Installs required python packages."""
+@@ -694,6 +698,8 @@ def install(
+         verbose: Print verbose output from pip install commands. Default is False.
+     """
+     info('Installing required python packages...')
 +    warning("Skipping dependencies install on NixOS")
 +    return
+ 
      if dev:
          run_install(
-             c,
-@@ -588,6 +594,8 @@ def install(c, uv=False, skip_plugins=False, dev=False):
- @task(help={'tests': 'Set up test dataset at the end'})
- def setup_dev(c, tests=False):
+@@ -737,6 +743,8 @@ def install(
+ )
+ def setup_dev(c, tests: bool = False, verbose: bool = False):
      """Sets up everything needed for the dev environment."""
 +    warning("Skipping dev env setup on NixOS")
 +    return
      # Install required Python packages with PIP
-     install(c, uv=False, skip_plugins=True, dev=True)
+     install(c, uv=False, skip_plugins=True, dev=True, verbose=verbose)
  
-@@ -672,6 +680,8 @@ def remove_mfa(c, mail='', username=''):
- @state_logger('TASK08')
+@@ -818,6 +826,8 @@ def remove_mfa(c, mail='', username=''):
+ @state_logger
  def static(c, frontend=False, clear=True, skip_plugins=False):
      """Copies required static files to the STATIC_ROOT directory, as per Django requirements."""
 +    warning("Skipping static file generation on NixOS")
@@ -45,52 +45,61 @@
      if frontend and node_available():
          frontend_compile(c)
  
-@@ -698,6 +708,8 @@ def translate(c, ignore_static=False, no_frontend=False):
-     Note: This command should not be used on a local install,
+@@ -845,6 +855,8 @@ def translate(c, ignore_static=False, no_frontend=False):
      it is performed as part of the InvenTree translation toolchain.
      """
+     info('Building translation files')
 +    warning("Skipping translation generation on NixOS")
 +    return
-     info('Building translation files')
  
      # Translate applicable .py / .html / .js files
-@@ -1676,6 +1688,8 @@ def frontend_compile(c, extract: bool = False):
-         c: Context variable
+     manage(c, 'makemessages --all -e py,html,js --no-wrap')
+@@ -1084,6 +1096,8 @@ def update(
+     - static (optional)
+     - clean_settings
+     """
++    warning("Update is disabled on NixOS")
++    return
+     info('Updating InvenTree installation...')
+ 
+     # Ensure required components are installed
+@@ -1978,6 +1992,8 @@ def frontend_compile(c, extract: bool = False):
          extract (bool): Whether to extract translations from source code. Defaults to False.
      """
+     info('Compiling frontend code...')
 +    warning("Skipping frontend compile on NixOS")
 +    return
-     info('Compiling frontend code...')
      frontend_install(c)
      frontend_trans(c, extract=extract)
-@@ -1690,6 +1704,8 @@ def frontend_install(c):
-     Args:
+     frontend_build(c)
+@@ -1992,6 +2008,8 @@ def frontend_install(c):
          c: Context variable
      """
+     info('Installing frontend dependencies')
 +    warning("Skipping frontend install on NixOS")
 +    return
-     info('Installing frontend dependencies')
      yarn(c, 'yarn install')
  
-@@ -1702,6 +1718,8 @@ def frontend_trans(c, extract: bool = True):
-         c: Context variable
+ 
+@@ -2004,6 +2022,8 @@ def frontend_trans(c, extract: bool = True):
          extract (bool): Whether to extract translations from source code. Defaults to True.
      """
+     info('Compiling frontend translations')
 +    warning("Skipping frontend translation compilation on NixOS")
 +    return
-     info('Compiling frontend translations')
      if extract:
          yarn(c, 'yarn run extract')
-@@ -1715,6 +1733,8 @@ def frontend_build(c):
-     Args:
+     yarn(c, 'yarn run compile')
+@@ -2017,6 +2037,8 @@ def frontend_build(c):
          c: Context variable
      """
+     info('Building frontend...')
 +    warning("Skipping frontend build on NixOS")
 +    return
-     info('Building frontend')
      yarn(c, 'yarn run build')
  
-@@ -1812,6 +1832,8 @@ def frontend_download(
+     def write_info(path: Path, content: str):
+@@ -2115,6 +2137,8 @@ def frontend_download(
      import requests
  
      info('Downloading frontend...')
@@ -99,12 +108,12 @@
  
      # globals
      default_headers = {'Accept': 'application/vnd.github.v3+json'}
-@@ -2013,6 +2035,8 @@ def docs_server(c, address='localhost:8080', compile_schema=False):
- )
- def build_docs(c, mkdocs=False):
-     """Build the required documents for building the docs. Optionally build the documentation using mkdocs."""
-+    warning("Skipping docs build on NixOS")
+@@ -2330,6 +2354,8 @@ def build_docs(c, mkdocs=False):
+ @task
+ def clear_generated(c):
+     """Clear generated files from `invoke update`."""
++    warning("Skipping cleaning python cache files on NixOS")
 +    return
-     migrate(c)
-     export_definitions(c, basedir='docs')
-     doc_schema(c)
+     # pyc/pyo files
+     run(c, 'find src -name "*.pyc" -exec rm -f {} +')
+     run(c, 'find src -name "*.pyo" -exec rm -f {} +')
