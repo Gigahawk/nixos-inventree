@@ -7,13 +7,13 @@
 }:
 stdenv.mkDerivation rec {
   pname = "inventree-kicad-plugin";
-  version = "2.0.3";
+  version = "2.0.4";
   src = (
     fetchFromGitHub {
       owner = "afkiwers";
       repo = "inventree_kicad";
       rev = version;
-      hash = "sha256-4ijzkswzuD6JnQ9VadFXvdixKlJ6lhaZ7Ov2YoAjSus=";
+      hash = "sha256-yCFA9z33CzmAtR7lVMA+FKaIeoQ/+Ha+QH4W5VKtHkQ";
     }
   );
   nativeBuildInputs = [
