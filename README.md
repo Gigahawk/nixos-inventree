@@ -33,3 +33,4 @@ A NixOS module to run Inventree as a native service
    downloads happen)
 4. Run `update-overrides.sh`
 5. Run `nix build .#src` to get expected hashes
+   - Pass `--keep-going` to get both hashes at once
