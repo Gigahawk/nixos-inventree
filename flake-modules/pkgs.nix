@@ -27,7 +27,13 @@
           refresh-users
           gen-secret
           inventree-python
+          venv
           ;
+        venvWithPlugins = pkgs.inventree.venv.override (final: {
+          plugins = {
+            inventree-kicad-plugin = [ ];
+          };
+        });
       };
     };
 }
