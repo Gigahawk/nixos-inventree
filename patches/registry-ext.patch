@@ -1,0 +1,17 @@
+diff --git a/src/backend/InvenTree/plugin/registry.py b/src/backend/InvenTree/plugin/registry.py
+index 382a97390..61d789924 100644
+--- a/src/src/backend/InvenTree/plugin/registry.py
++++ b/src/src/backend/InvenTree/plugin/registry.py
+@@ -564,6 +564,12 @@ class PluginsRegistry:
+                         dirs.append(pd_path)
+                         logger.info("Added plugin directory: '%s' as '%s'", pd, pd_path)
+ 
++                        # HACK: Add to sys.path to allow proper import of interactively installed plugins/dependencies
++                        pd_path = os.path.abspath(pd_path)
++                        if not any(os.path.abspath(p) == pd_path for p in sys.path):
++                            sys.path.insert(0, pd_path)
++                            logger.warning("Added plugin directory to sys.path: '%s'", pd_path)
++
+         return dirs
+ 
+     def collect_plugins(self):
