@@ -30,11 +30,15 @@ export INVENTREE_PLUGIN_FILE="$PLUGIN_FILE"
 
 export INVENTREE_DB_ENGINE="sqlite3"
 export INVENTREE_DB_NAME="$DB_NAME"
+export INVENTREE_DB_TIMEOUT=600
+
 export INVENTREE_SITE_URL="http://localhost:8000"
 
 export INVENTREE_DEBUG="True"
 export INVENTREE_PLUGINS_ENABLED="True"
 export INVENTREE_LOG_LEVEL="INFO"
+# Installing plugins from git seems to take forever?
+export INVENTREE_BACKGROUND_TIMEOUT=600
 
 export INVENTREE_ADMIN_ENABLED="True"
 export INVENTREE_ADMIN_USER="admin"
