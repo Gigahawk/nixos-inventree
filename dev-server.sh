@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
 cleanup() {
-  kill "$(ps -s $$ -o pid=)" 2>/dev/null
+  echo "Killing child processes"
+  kill 0
 }
-trap cleanup EXIT INT TERM
+
+trap cleanup EXIT
+trap 'exit 130' INT  # Ctrl+C
+trap 'exit 143' TERM # kill (default SIGTERM)
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 SRV_ROOT="$SCRIPT_DIR/.scratch/dev-server"
