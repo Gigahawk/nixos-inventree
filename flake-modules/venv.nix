@@ -19,8 +19,6 @@
       _self.pyprojectOverrides
     ];
 
-    plugins = { };
-
     python = _self.callPackage ({ python312 }: python312) { };
 
     pythonSet = _self.callPackage (
@@ -35,9 +33,43 @@
       {
         pythonSet,
         workspace,
-        plugins,
+        extraWorkspaces ? null,
+        extraOverrides ? null,
       }:
-      pythonSet.mkVirtualEnv "inventree-python" (workspace.deps.default // plugins)
+      let
+        extOverrides = if extraOverrides != null then import extraOverrides else (_: _: { });
+        extWorkspace =
+          if extraWorkspaces != null then
+            inputs.uv2nix.lib.workspace.loadWorkspace { workspaceRoot = extraWorkspaces; }
+          else
+            null;
+        extOverlay =
+          if extWorkspace != null then
+            extWorkspace.mkPyprojectOverlay { sourcePreference = "wheel"; }
+          else
+            null;
+        extEditableOverlay =
+          if extWorkspace != null then
+            extWorkspace.mkEditablePyprojectOverlay { root = "$REPO_ROOT"; }
+          else
+            null;
+        extSet =
+          if extOverlay != null then
+            pythonSet.overrideScope (
+              lib.composeManyExtensions [
+                inputs.pyproject-build-systems.overlays.wheel
+                extOverlay
+                # Is this necessary for our usecase?
+                extEditableOverlay
+                _self.pyprojectOverrides
+                extOverrides
+              ]
+            )
+          else
+            pythonSet;
+        extDeps = if extWorkspace != null then extWorkspace.deps.default else { };
+      in
+      extSet.mkVirtualEnv "inventree-python" (workspace.deps.default // extDeps)
     ) { };
   };
 }

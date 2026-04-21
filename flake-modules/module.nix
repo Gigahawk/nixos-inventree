@@ -68,7 +68,8 @@
               p:
               p.overrideScope (
                 _: _: {
-                  inherit (cfg) plugins;
+                  extraWorkspaces = cfg.pluginWorkspace;
+                  extraOverrides = cfg.pluginOverrides;
                 }
               );
           };
@@ -94,16 +95,22 @@
           #  '';
           #};
 
-          plugins = mkOption {
-            type = types.attrsOf (types.listOf types.str);
-            default = { };
+          pluginWorkspace = mkOption {
+            type = types.nullOr types.path;
+            default = null;
             description = ''
-              Plugins to include in the environment.
-              See the plugins dir for supported plugins 
+              A path to a uv workspace containing extra plugins/python packages to install into the environment
             '';
-            example = {
-              inventree-kicad-plugin = [ ];
-            };
+            example = ../plugin_ws;
+          };
+
+          pluginOverrides = mkOption {
+            type = types.nullOr types.path;
+            default = null;
+            description = ''
+              A path to an overrides file if required to get plugins to build
+            '';
+            example = ../plugin_ws/plugin-overrides.nix;
           };
 
           serverBind = mkOption {

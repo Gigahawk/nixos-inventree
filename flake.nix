@@ -2,7 +2,7 @@
   description = "Devshell and package definition";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:Gigahawk/nixpkgs/nixos-inventree";
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
 

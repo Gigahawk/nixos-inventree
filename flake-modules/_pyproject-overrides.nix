@@ -65,11 +65,4 @@ final: prev: {
       prev.wheel
     ];
   });
-
-  # Plugins
-  # TODO: is there a nice way to not have to inherit prev?
-  inventree-kicad-plugin = (
-    final.callPackage ../plugins/inventree-kicad-plugin.nix { inherit prev; }
-  );
-
 }
