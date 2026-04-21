@@ -34,8 +34,10 @@
         pythonSet,
         workspace,
         extraWorkspaces ? null,
+        extraOverrides ? null,
       }:
       let
+        extOverrides = if extraOverrides != null then import extraOverrides else (_: _: { });
         extWorkspace =
           if extraWorkspaces != null then
             inputs.uv2nix.lib.workspace.loadWorkspace { workspaceRoot = extraWorkspaces; }
@@ -59,13 +61,8 @@
                 extOverlay
                 # Is this necessary for our usecase?
                 extEditableOverlay
-
-                #(_self.pyprojectOverlay (
-                #  _: _: {
-                #    inherit (_self) hacks;
-                #  }
-                #))
-                (_self.pyprojectOverrides)
+                _self.pyprojectOverrides
+                extOverrides
               ]
             )
           else

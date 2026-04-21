@@ -31,6 +31,7 @@
           ;
         venvWithPlugins = pkgs.inventree.venv.override (final: {
           extraWorkspaces = ../plugin_ws;
+          extraOverrides = ../plugin_ws/plugin-overrides.nix;
         });
       };
     };
