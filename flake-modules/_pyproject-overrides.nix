@@ -66,10 +66,35 @@ final: prev: {
     ];
   });
 
-  # Plugins
-  # TODO: is there a nice way to not have to inherit prev?
-  inventree-kicad-plugin = (
-    final.callPackage ../plugins/inventree-kicad-plugin.nix { inherit prev; }
-  );
+  # Plugin
+  ## TODO: is there a nice way to not have to inherit prev?
+  #inventree-kicad-plugin = final.callPackage ../plugins/inventree-kicad-plugin.nix { inherit prev; };
+  ## TODO: nice way of handling plugin dependencies?
+  #inventree-digikey-supplier = final.callPackage ../plugins/inventree-digikey-supplier.nix {
+  #  inherit prev;
+  #};
+  #digikey-api-v4 = final.callPackage ../plugins/digikey-api-v4.nix {
+  #  inherit prev;
+  #};
+  #bravado = final.hacks.nixpkgsPrebuilt {
+  #  from = final.python.pkgs.bravado;
+  #};
 
+  # Plugin overrides
+  # TODO: provide this externally?
+  bravado = prev.bravado.overrideAttrs (old: {
+    buildInputs = (old.buildInputs or [ ]) ++ [
+      prev.setuptools
+    ];
+  });
+  bravado-core = prev.bravado-core.overrideAttrs (old: {
+    buildInputs = (old.buildInputs or [ ]) ++ [
+      prev.setuptools
+    ];
+  });
+  digikey-api-v4 = prev.digikey-api-v4.overrideAttrs (old: {
+    buildInputs = (old.buildInputs or [ ]) ++ [
+      prev.uv-build
+    ];
+  });
 }
