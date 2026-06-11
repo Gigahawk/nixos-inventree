@@ -18,6 +18,14 @@ A NixOS module to run Inventree as a native service
 > possible to simultaneously update both the Inventree and
 > inventree-kicad-plugin versions without running into issues during migration
 >
+> EDIT TBD: As of of commit-hash TBD Plugins are now defined in a separate `uv`
+> workspace. See the `plugin_ws` folder for an example Define your own with:
+
+```
+uv init
+uv add <plugin> --project .
+```
+
 > EDIT 2026-02-20: As of
 > https://github.com/Gigahawk/nixos-inventree/commit/8c9ab6ddfc5fb2486543127522fa4a1583edb8a2
 > it is now possible to define installed plugins from the NixOS module. If you
@@ -34,9 +42,3 @@ A NixOS module to run Inventree as a native service
 4. Run `update-overrides.sh`
 5. Run `nix build .#src` to get expected hashes
    - Pass `--keep-going` to get both hashes at once
-
-## Updating plugins
-
-1. Update version and hash of the file in `plugins/` (use dummy hashes to ensure
-   new downloads happen)
-2. Run `nix build .#venvWithPlugins` to get the new hash
