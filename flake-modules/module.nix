@@ -56,6 +56,23 @@
           ;
       in
       {
+        imports = [
+          (lib.mkRenamedOptionModule
+            [ "services" "inventree" "siteUrl" ]
+            [ "services" "inventree" "config" "site_url" ]
+          )
+          (lib.mkRenamedOptionModule
+            [ "services" "inventree" "allowedHosts" ]
+            [ "services" "inventree" "config" "allowed_hosts" ]
+          )
+          (lib.mkRemovedOptionModule [ "services" "inventree" "plugins" ] ''
+            services.inventree.plugins has been removed.
+
+            The plugin system now uses a uv.lock-based workflow.
+            Use services.inventree.pluginWorkspace instead.
+          '')
+        ];
+
         options.services.inventree = {
           enable = mkEnableOption (lib.mdDoc "Open Source Inventory Management System");
 
@@ -272,17 +289,6 @@
             );
           };
         };
-
-        imports = [
-          (lib.mkRenamedOptionModule
-            [ "services" "inventree" "siteUrl" ]
-            [ "services" "inventree" "config" "site_url" ]
-          )
-          (lib.mkRenamedOptionModule
-            [ "services" "inventree" "allowedHosts" ]
-            [ "services" "inventree" "config" "allowed_hosts" ]
-          )
-        ];
 
         config = mkIf cfg.enable {
           environment.systemPackages = [
