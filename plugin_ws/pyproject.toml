@@ -1,0 +1,15 @@
+[project]
+name = "inventree-plugins"
+version = "0.1.0"
+description = "Inventree plugins env"
+requires-python = ">=3.12"
+dependencies = [
+    "inventree-digikey-supplier",
+    "inventree-kicad-plugin>=2.0.4",
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.uv.sources]
+inventree-digikey-supplier = { git = "https://github.com/Gigahawk/inventree-digikey-supplier.git" }

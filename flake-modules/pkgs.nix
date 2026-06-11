@@ -30,9 +30,8 @@
           venv
           ;
         venvWithPlugins = pkgs.inventree.venv.override (final: {
-          plugins = {
-            inventree-kicad-plugin = [ ];
-          };
+          extraWorkspaces = ../plugin_ws;
+          extraOverrides = ../plugin_ws/plugin-overrides.nix;
         });
       };
     };

@@ -56,6 +56,23 @@
           ;
       in
       {
+        imports = [
+          (lib.mkRenamedOptionModule
+            [ "services" "inventree" "siteUrl" ]
+            [ "services" "inventree" "config" "site_url" ]
+          )
+          (lib.mkRenamedOptionModule
+            [ "services" "inventree" "allowedHosts" ]
+            [ "services" "inventree" "config" "allowed_hosts" ]
+          )
+          (lib.mkRemovedOptionModule [ "services" "inventree" "plugins" ] ''
+            services.inventree.plugins has been removed.
+
+            The plugin system now uses a uv.lock-based workflow.
+            Use services.inventree.pluginWorkspace instead.
+          '')
+        ];
+
         options.services.inventree = {
           enable = mkEnableOption (lib.mdDoc "Open Source Inventory Management System");
 
@@ -68,7 +85,8 @@
               p:
               p.overrideScope (
                 _: _: {
-                  inherit (cfg) plugins;
+                  extraWorkspaces = cfg.pluginWorkspace;
+                  extraOverrides = cfg.pluginOverrides;
                 }
               );
           };
@@ -94,16 +112,22 @@
           #  '';
           #};
 
-          plugins = mkOption {
-            type = types.attrsOf (types.listOf types.str);
-            default = { };
+          pluginWorkspace = mkOption {
+            type = types.nullOr types.path;
+            default = null;
             description = ''
-              Plugins to include in the environment.
-              See the plugins dir for supported plugins 
+              A path to a uv workspace containing extra plugins/python packages to install into the environment
             '';
-            example = {
-              inventree-kicad-plugin = [ ];
-            };
+            example = ../plugin_ws;
+          };
+
+          pluginOverrides = mkOption {
+            type = types.nullOr types.path;
+            default = null;
+            description = ''
+              A path to an overrides file if required to get plugins to build
+            '';
+            example = ../plugin_ws/plugin-overrides.nix;
           };
 
           serverBind = mkOption {
@@ -265,17 +289,6 @@
             );
           };
         };
-
-        imports = [
-          (lib.mkRenamedOptionModule
-            [ "services" "inventree" "siteUrl" ]
-            [ "services" "inventree" "config" "site_url" ]
-          )
-          (lib.mkRenamedOptionModule
-            [ "services" "inventree" "allowedHosts" ]
-            [ "services" "inventree" "config" "allowed_hosts" ]
-          )
-        ];
 
         config = mkIf cfg.enable {
           environment.systemPackages = [
